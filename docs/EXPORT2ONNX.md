@@ -32,7 +32,7 @@ Create the project workspace.
 Clone this repository:
 
     cd $PROJECTS
-    git clone https://github.com/parlaynu/megadetectorv5-onnx
+    git clone https://github.com/parlaynu/megadetector-v5-onnx
 
 Download the megadetector v5 saved models:
 
@@ -47,8 +47,8 @@ Download the megadetector v5 saved models:
 Setup python virtual environment:
 
     cd $PROJECTS
-    python3.9 -m venv pyenv-export
-    source pyenv-export/bin/activate
+    python3.9 -m venv pyexport
+    source pyexport/bin/activate
 
 Install the versions of torch and torchvision needed by megadetector v5:
 
@@ -64,7 +64,7 @@ a minimal list to install:
     pip install pyyaml==6.0 requests==2.28.1 tqdm==4.64.1
     pip install opencv-python-headless==4.6.0.66 pandas==1.5.1 seaborn==0.12.1
 
-## Install YoloV5 and Export
+## Clone The YoloV5 Repository and Export
 
 Clone yolo-v5 repository and install dependencies:
 
@@ -106,6 +106,6 @@ This package needs to build from source for the Raspberry Pi. Seems to run quite
 Run the optimizer over the model. The example below will create a model named `md_v5a.0.0-opt.onnx` in the
 same directory as the source model.
 
-    cd $PROJECTS/megadetectorv5-onnx/tools
-    ./optimize-onnx.py ../../megamodels/md_v5a.0.0.onnx
+    cd $PROJECTS/megadetector-v5-onnx
+    ./tools/optimize-onnx.py ../megamodels/md_v5a.0.0.onnx
 

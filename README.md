@@ -1,7 +1,7 @@
 # MegaDetector V5 - ONNX
 
-This project explains how to export the Megadetector V5 models to ONNX format, and provides some tools
-to easily run inference using the ONNX model.
+This project explains how to export the [Megadetector V5](https://github.com/microsoft/CameraTraps/blob/main/megadetector.md) 
+models to ONNX format, and provides some tools to easily run inference using the ONNX model.
 
 The two main reasons I had for doing this were:
 
@@ -82,7 +82,7 @@ It saves a version of the model in the same location as the source, but with `_o
 I haven't seen much of a gain using this, but leaving it here just in case.
 
 
-## Reference
+## References
 
 * https://github.com/microsoft/CameraTraps/blob/main/megadetector.md
 * https://github.com/ultralytics/yolov5
