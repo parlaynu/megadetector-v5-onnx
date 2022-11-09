@@ -35,9 +35,9 @@ saved, not just those with detections.
 
 ## Example
 
-A simple example for using it to process 2 batches of images:
+A simple example for using it to process 1 batch of images:
 
-    ./tools/run-onnx.py -n 2 -p -c ../megamodels/md_v5a.0.0_640x512_1.onnx \
+    ./tools/run-onnx.py -n 1 -p -c ../megamodels/md_v5a.0.0_640x512_1.onnx \
                     images/original images/output
     
     preparing session

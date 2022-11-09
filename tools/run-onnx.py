@@ -28,7 +28,7 @@ def prepare_session(model_path, force_cpu):
     return sess
 
 
-def build_pipeline(session, image_dir, args):
+def build_pipeline(session, args):
     import ops
     
     print("building pipeline")
@@ -37,7 +37,7 @@ def build_pipeline(session, image_dir, args):
     
     batch_size, nchans, height, width = session.get_inputs()[0].shape
     
-    pipe = ops.find_images(image_dir, args.recurse, args.extensions)
+    pipe = ops.find_images(args.image_src, args.recurse, args.extensions)
     pipe = ops.load_image(pipe, width, height, nchans, args.preserve_aspect)
 
     if batch_size > 1:
@@ -51,7 +51,9 @@ def build_pipeline(session, image_dir, args):
         if args.crop_outputs:
             pipe = ops.crop_detections(pipe)
 
-        pipe = ops.save_images(pipe, args.image_dir, args.output_dir, args.save_all)
+        src_dir = args.image_src if os.path.isdir(args.image_src) else os.path.dirname(args.image_src)
+
+        pipe = ops.save_images(pipe, src_dir, args.output_dir, args.save_all)
 
     return pipe
 
@@ -68,12 +70,12 @@ def main():
     parser.add_argument('-c', '--crop-outputs', help='crop the output into smaller images and save in output dir', action='store_true')
     parser.add_argument('-a', '--save-all', help='save all images, not just those with detections', action='store_true')
     parser.add_argument('model_path', help='path to model file', type=str, default=None)
-    parser.add_argument('image_dir', help='path to images', type=str, default=None)
+    parser.add_argument('image_src', help='path to images or single image or movie', type=str, default=None)
     parser.add_argument('output_dir', help='path to write output images', nargs='?', type=str, default=None)
     args = parser.parse_args()
 
     sess = prepare_session(args.model_path, args.force_cpu)
-    pipe = build_pipeline(sess, args.image_dir, args)
+    pipe = build_pipeline(sess, args)
 
     start = time.time()
     
@@ -82,12 +84,17 @@ def main():
     for idx, item in enumerate(pipe):
         pass
     
-    duration = time.time() - start
-    average = duration / (idx+1)
-    
     print("summary")
+
+    duration = time.time() - start
     print(f"- total runtime: {duration:0.2f}")
-    print(f"-  average step: {average:0.2f}")
+
+    try:
+        average = duration / (idx+1)
+        print(f"-       average: {average:0.2f}")
+    except UnboundLocalError:
+        pass
+        
 
 
 if __name__ == "__main__":

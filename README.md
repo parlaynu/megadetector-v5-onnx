@@ -3,7 +3,7 @@
 This project explains how to export the [Megadetector V5](https://github.com/microsoft/CameraTraps/blob/main/megadetector.md) 
 models to ONNX format, and provides some tools to easily run inference using the ONNX model.
 
-The two main reasons I had for doing this were:
+The two main reasons I had for doing this:
 
 * easier to run on a edge devices - fewer dependencies
 * support for a wider range of devices - via the OpenVINO execution provider
@@ -14,7 +14,8 @@ want to change either, you need to re-export.
 
 ## Exporting to ONNX
 
-This is reasonably complicated as there are a lot of dependencies to manage with specific version requirements.
+This is reasonably complicated as there are a lot of dependencies to manage and some of them are getting
+reasonably old.
 
 The document linked to explains how to make it work on a RaspberryPi 4b 8G with a clean install of the
 operating system. I documented it this way so I could capture all the software that was needed.

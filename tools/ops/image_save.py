@@ -11,7 +11,7 @@ def save_images(pipe, inp_root, out_root, save_all):
         for ipath, output, pred in zip(item['path'], item['output'], item['pred']):
             if save_all == False and len(pred) == 0:
                 continue
-            
+
             ilocal = ipath.removeprefix(inp_root)
             if ilocal.startswith('/'):
                 ilocal = ilocal[1:]
