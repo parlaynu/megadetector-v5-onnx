@@ -1,0 +1,14 @@
+# directories to ignore
+local/
+output/
+snapshots/
+snapshots-*/
+model_zoo/
+*.egg-info/
+pyenv/
+.ipynb_checkpoints/
+
+\._*
+
+# system files
+.DS_Store
