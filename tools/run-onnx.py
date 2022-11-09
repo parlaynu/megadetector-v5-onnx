@@ -37,13 +37,12 @@ def build_pipeline(session, args):
     
     batch_size, nchans, height, width = session.get_inputs()[0].shape
     
-    pipe = ops.find_images(args.image_src, args.recurse, args.extensions)
-    pipe = ops.load_image(pipe, width, height, nchans, args.preserve_aspect)
+    pipe = ops.load_images(args.image_src, args.recurse, args.extensions)
 
     if batch_size > 1:
         pipe = ops.batcher(pipe, batch_size)
 
-    pipe = ops.transform_image(pipe)
+    pipe = ops.transform_images(pipe, width, height, nchans, args.preserve_aspect)
     pipe = ops.infer(pipe, session)
 
     if args.output_dir is not None:

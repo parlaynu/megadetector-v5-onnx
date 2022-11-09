@@ -4,25 +4,22 @@ from itertools import count
 import cv2
 
 
-def find_images(image_src, recurse, extensions):
-    
+def load_images(image_src, recurse, extensions):
+
     if os.path.isfile(image_src):
-        item = {
-            'path': [image_src]
-        }
-        yield item
-
+        yield from _load_from_file(image_src, 0)
+    
     elif os.path.isdir(image_src):
-        yield from _scan_dir(image_src, recurse, extensions)
+        yield from _load_from_dir(image_src, recurse, extensions)
+    
 
-
-def _scan_dir(image_dir, recurse, extensions):
-
+def _load_from_dir(image_src, recurse, extensions):
+    
     extensions = extensions.split(',')
     extensions = {"."+e.lower() for e in extensions}
 
     dirs = list()
-    dirs.append(image_dir)
+    dirs.append(image_src)
     
     idx = 0
     while(len(dirs) > 0):
@@ -45,72 +42,45 @@ def _scan_dir(image_dir, recurse, extensions):
                 if ext.lower() not in extensions:
                     continue
                 
-                print(f"{idx:04d} found image {epath}")
                 idx += 1
                 
-                item = {
-                    'path': [epath]
-                }
-                yield item
+                yield from _load_from_file(epath, idx)
         
         dirs.sort(reverse=True)
 
 
-def load_image(pipe, width, height, nchans, preserve_aspect):
+def _load_from_file(image_src, idx):
     
-    for item in pipe:
+    print(f"{idx:04d} loading image {image_src}")
+
+    # try and load it as a regular image
+    img = cv2.imread(image_src)
+    if img is not None:
         
-        # try and load it as a regular image
-        img = cv2.imread(item['path'][0])
-        if img is not None:
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB);
-            item['original_image'] = [img]
-            item['image'] = [_process_image(img, width, height, nchans, preserve_aspect)]
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB);
+        item = {
+            'path': [image_src],
+            'image': [img]
+        }
+        yield item
+
+    else:
+        # try it like a video
+        cap = cv2.VideoCapture(image_src)
+        root, ext = os.path.splitext(image_src)
+    
+        for idx in count():
+            ret, img = cap.read()
+            if ret == False:
+                break
+        
+            print(f"- loading video frame {idx:06d}")
+        
+            item = {
+                'path': [f"{root}_{idx:06d}.jpg"],
+                'image': [img]
+            }
             yield item
 
-        else:
-            # try it like a video
-            cap = cv2.VideoCapture(item['path'][0])
-            root, ext = os.path.splitext(item['path'][0])
-            
-            for idx in count():
-                ret, img = cap.read()
-                if ret == False:
-                    break
-                
-                print(f"{idx:04d} processing frame")
-                
-                nitem = item.copy()
-                nitem['original_image'] = [img]
-                nitem['image'] = [_process_image(img, width, height, nchans, preserve_aspect)]
-                nitem['path'] = [f"{root}_{idx:04d}.jpg"]
-                yield nitem
-
-            cap.release()
-
-
-
-def _process_image(img, width, height, nchans, preserve_aspect):
-
-        iheight, iwidth, _ = img.shape
-        if iheight != height or iwidth != width:
-            nwidth, nheight = width, height
-            if preserve_aspect:
-                scale = min(width/iwidth, height/iheight)
-                nwidth, nheight = int(scale*iwidth), int(scale*iheight)
-            
-            print(f"- resizing from {iwidth}x{iheight} to {nwidth}x{nheight}")
-            img = cv2.resize(img, (nwidth, nheight), interpolation=cv2.INTER_LINEAR)
-            
-            if nwidth != width or nheight != height:
-                top = int((height - nheight)/2)
-                bottom = height - nheight - top
-                left = int((width - nwidth)/2)
-                right = width - nwidth - left
-
-                print(f"- padding from {nwidth}x{nheight} to {width}x{height}")
-                img = cv2.copyMakeBorder(img, top, bottom, left, right, cv2.BORDER_CONSTANT)
-
-        return img
-
+        cap.release()
 
