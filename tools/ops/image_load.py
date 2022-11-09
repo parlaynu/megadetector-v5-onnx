@@ -70,7 +70,6 @@ def load_image(pipe, width, height, nchans, preserve_aspect):
 
         else:
             # try it like a video
-            print("trying as video...")
             cap = cv2.VideoCapture(item['path'][0])
             root, ext = os.path.splitext(item['path'][0])
             
