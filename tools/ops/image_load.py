@@ -6,8 +6,15 @@ import cv2
 
 def load_images(image_src, recurse, extensions):
 
+    # extract any starting frame specificier
+    cidx = image_src.find(':', 2)
+    start_idx = 0
+    if cidx != -1:
+        image_src, start_idx = image_src[:cidx], int(image_src[cidx+1:])
+
+    # 
     if os.path.isfile(image_src):
-        yield from _load_from_file(image_src, 0)
+        yield from _load_from_file(image_src, 0, start_idx)
     
     elif os.path.isdir(image_src):
         yield from _load_from_dir(image_src, recurse, extensions)
@@ -42,16 +49,16 @@ def _load_from_dir(image_src, recurse, extensions):
                 if ext.lower() not in extensions:
                     continue
                 
-                idx += 1
-                
                 yield from _load_from_file(epath, idx)
+
+                idx += 1
         
         dirs.sort(reverse=True)
 
 
-def _load_from_file(image_src, idx):
+def _load_from_file(image_src, idx, start_idx=0):
     
-    print(f"{idx:04d} loading image {image_src}")
+    print(f"{idx:06d} loading {image_src}")
 
     # try and load it as a regular image
     img = cv2.imread(image_src)
@@ -68,13 +75,21 @@ def _load_from_file(image_src, idx):
         # try it like a video
         cap = cv2.VideoCapture(image_src)
         root, ext = os.path.splitext(image_src)
+        
+        # seek forward to starting frame in the video
+        if start_idx > 0:
+            print(f"- skipping {start_idx} video frames")
+            for idx in range(start_idx):
+                ret, img = cap.read()
+                if ret == False:
+                    break
     
-        for idx in count():
+        for idx in count(start_idx):
             ret, img = cap.read()
             if ret == False:
                 break
         
-            print(f"- loading video frame {idx:06d}")
+            print(f"{idx:06d} reading video frame")
         
             item = {
                 'path': [f"{root}_{idx:06d}.jpg"],

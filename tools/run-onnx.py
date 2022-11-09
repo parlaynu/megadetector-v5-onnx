@@ -69,7 +69,7 @@ def main():
     parser.add_argument('-c', '--crop-outputs', help='crop the output into smaller images and save in output dir', action='store_true')
     parser.add_argument('-a', '--save-all', help='save all images, not just those with detections', action='store_true')
     parser.add_argument('model_path', help='path to model file', type=str, default=None)
-    parser.add_argument('image_src', help='path to images or single image or movie', type=str, default=None)
+    parser.add_argument('image_src', help='path to images or single image or movie[:start_frame]', type=str, default=None)
     parser.add_argument('output_dir', help='path to write output images', nargs='?', type=str, default=None)
     args = parser.parse_args()
 
