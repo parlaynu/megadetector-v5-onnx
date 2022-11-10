@@ -12,5 +12,3 @@ from .infer import infer
 from .bboxes import draw_bboxes
 from .cut_objects import cut_objects
 
-from .fb_viewer import fb_viewer
-

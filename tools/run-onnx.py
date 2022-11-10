@@ -76,9 +76,6 @@ def build_pipeline(session, args):
 
         pipe = ops.save_images(pipe, src_dir, args.output_dir, args.save_all)
     
-    if args.fb_view != -1:
-        pipe = ops.fb_viewer(pipe)
-
     return pipe
 
 
@@ -92,7 +89,6 @@ def main():
     parser.add_argument('-c', '--force-cpu', help='use the CPU even if there is an accelerator', action='store_true')
     parser.add_argument('-x', '--cut-objects', help='cut detected objects from full image and save as individual images', action='store_true')
     parser.add_argument('-a', '--save-all', help='save all images, not just those with detections', action='store_true')
-    parser.add_argument('-v', '--fb-view', help='display image on the framebuffer device', type=int, default=-1)
     parser.add_argument('model_path', help='path to model file', type=str, default=None)
     parser.add_argument('image_src', help='source of images - directory, file, or special', type=str, default=None)
     parser.add_argument('output_dir', help='path to write output images', nargs='?', type=str, default=None)
