@@ -39,9 +39,10 @@ def build_pipeline(session, args):
     
     if args.image_src.startswith("picamera2"):
         cidx = args.image_src.find(':', 2)
-        cname = "picam2" if cidx == -1 else args.image_src[cidx+1:]
-        
-        pipe = ops.load_from_picamera2(cname, width, height)
+        params = []
+        if cidx != -1:
+            params = args.image_src[cidx+1:].split(',')
+        pipe = ops.load_from_picamera2(params, width, height)
 
     else:  # fall back to images/videos from disk
         pipe = ops.load_images(args.image_src, args.recurse, args.extensions)
