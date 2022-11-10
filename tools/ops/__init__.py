@@ -10,6 +10,7 @@ from .image_transform import transform_images
 from .infer import infer
 
 from .bboxes import draw_bboxes
-from .cropper import crop_detections
+from .cut_objects import cut_objects
 
+from .fb_viewer import fb_viewer
 

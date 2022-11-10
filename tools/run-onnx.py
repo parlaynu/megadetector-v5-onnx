@@ -52,7 +52,14 @@ def build_pipeline(session, args):
         pipe = ops.load_from_jetson_csi(params, width, height)
         
     else:  # fall back to images/videos from disk
-        pipe = ops.load_images(args.image_src, args.recurse, args.extensions)
+        cidx = args.image_src.find(',')
+        image_src = args.image_src
+        image_exs = ['jpg', 'jpeg']
+        if cidx != -1:
+            image_src = args.image_src[:cidx]
+            image_exs = args.image_src[cidx+1:].split(',')
+        
+        pipe = ops.load_images(image_src, image_exs, args.recurse)
 
     if batch_size > 1:
         pipe = ops.batcher(pipe, batch_size)
@@ -62,12 +69,15 @@ def build_pipeline(session, args):
 
     if args.output_dir is not None:
         pipe = ops.draw_bboxes(pipe)
-        if args.crop_outputs:
-            pipe = ops.crop_detections(pipe)
+        if args.cut_objects:
+            pipe = ops.cut_objects(pipe)
 
         src_dir = args.image_src if os.path.isdir(args.image_src) else os.path.dirname(args.image_src)
 
         pipe = ops.save_images(pipe, src_dir, args.output_dir, args.save_all)
+    
+    if args.fb_view != -1:
+        pipe = ops.fb_viewer(pipe)
 
     return pipe
 
@@ -77,12 +87,12 @@ def main():
     
     parser = argparse.ArgumentParser()
     parser.add_argument('-n', '--num-batches', help='number of batches to process', type=int, default=0)
-    parser.add_argument('-e', '--extensions', help='file extensions to identify as images (case insensitive)', type=str, default='jpg,jpeg')
     parser.add_argument('-r', '--recurse', help='recursively search directory for images', action='store_true')
     parser.add_argument('-p', '--preserve-aspect', help='preserve image aspect ratio (pad if needed)', action='store_true')
-    parser.add_argument('-f', '--force-cpu', help='use the CPU even if there is an accelerator', action='store_true')
-    parser.add_argument('-c', '--crop-outputs', help='crop the output into smaller images and save in output dir', action='store_true')
+    parser.add_argument('-c', '--force-cpu', help='use the CPU even if there is an accelerator', action='store_true')
+    parser.add_argument('-x', '--cut-objects', help='cut detected objects from full image and save as individual images', action='store_true')
     parser.add_argument('-a', '--save-all', help='save all images, not just those with detections', action='store_true')
+    parser.add_argument('-v', '--fb-view', help='display image on the framebuffer device', type=int, default=-1)
     parser.add_argument('model_path', help='path to model file', type=str, default=None)
     parser.add_argument('image_src', help='source of images - directory, file, or special', type=str, default=None)
     parser.add_argument('output_dir', help='path to write output images', nargs='?', type=str, default=None)

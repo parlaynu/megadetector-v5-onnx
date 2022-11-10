@@ -1,6 +1,6 @@
 
 
-def crop_detections(pipe):
+def cut_objects(pipe):
     
     for item in pipe:
 

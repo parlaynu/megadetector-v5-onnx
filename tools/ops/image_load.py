@@ -4,7 +4,7 @@ from itertools import count
 import cv2
 
 
-def load_images(image_src, recurse, extensions):
+def load_images(image_src, image_exs, recurse):
 
     # extract any starting frame specificier
     cidx = image_src.find(':', 2)
@@ -16,13 +16,12 @@ def load_images(image_src, recurse, extensions):
         yield from _load_from_file(image_src, 0, start_idx)
     
     elif os.path.isdir(image_src):
-        yield from _load_from_dir(image_src, recurse, extensions)
+        yield from _load_from_dir(image_src, image_exs, recurse)
     
 
-def _load_from_dir(image_src, recurse, extensions):
+def _load_from_dir(image_src, image_exs, recurse):
     
-    extensions = extensions.split(',')
-    extensions = {"."+e.lower() for e in extensions}
+    image_exs = {"."+e.lower() for e in image_exs}
 
     dirs = list()
     dirs.append(image_src)
@@ -45,7 +44,7 @@ def _load_from_dir(image_src, recurse, extensions):
             
             if os.path.isfile(epath):
                 _, ext = os.path.splitext(epath)
-                if ext.lower() not in extensions:
+                if ext.lower() not in image_exs:
                     continue
                 
                 yield from _load_from_file(epath, idx)

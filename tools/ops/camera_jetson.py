@@ -42,6 +42,14 @@ def load_from_jetson_csi(params, width, height):
         if ok == False:
             break
         
+        # REVISIT: find a gstreamer way to do this
+        if hflip and vflip:
+            img = cv2.flip(img, -1)
+        elif hflip:
+            img = cv2.flip(img, 1)
+        elif vflip:
+            img = cv2.flip(img, 0)
+        
         item = {
             'path': [f"{cam_name}_{idx:06d}.jpg"],
             'image': [img]
