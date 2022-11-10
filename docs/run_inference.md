@@ -4,27 +4,25 @@
 
 The `run-onnx.py` tool accepts the following arguments:
 
-    ./tools/run-onnx.py -h
-    usage: run-onnx.py [-h] [-n NUM_BATCHES] [-e EXTENSIONS] [-r] [-p] [-f] [-c] [-a]
-                       model_path image_src [output_dir]
-                       
+    usage: run-onnx.py [-h] [-n NUM_BATCHES] [-r] [-p] [-c] [-x] [-a] [-v FB_VIEW] model_path image_src [output_dir]
+
     positional arguments:
       model_path            path to model file
-      image_src             path to images
+      image_src             source of images - directory, file, or special
       output_dir            path to write output images
-      
+
     optional arguments:
       -h, --help            show this help message and exit
       -n NUM_BATCHES, --num-batches NUM_BATCHES
                             number of batches to process
-      -e EXTENSIONS, --extensions EXTENSIONS
-                            file extensions to identify as images (case insensitive)
       -r, --recurse         recursively search directory for images
       -p, --preserve-aspect
                             preserve image aspect ratio (pad if needed)
-      -f, --force-cpu       use the CPU even if there is an accelerator
-      -c, --crop-outputs    crop the output into smaller images and save in output dir
+      -c, --force-cpu       use the CPU even if there is an accelerator
+      -x, --cut-objects     cut detected objects from full image and save as individual images
       -a, --save-all        save all images, not just those with detections
+      -v FB_VIEW, --fb-view FB_VIEW
+                            display image on the framebuffer device
 
 The input requirements of the model (image size, batch size) are automatically detected from the model. Input images are
 resized and optionally padded (-p) as needed to match the size, and batches are constructed.
@@ -39,7 +37,7 @@ For details on the `image_src` parameter, see [this](/docs/image_sources.md).
 
 A simple example for using it to process 1 batch of images:
 
-    ./tools/run-onnx.py -n 1 -p -c \
+    ./tools/run-onnx.py -n 1 -p -x \
                     ../megamodels/md_v5a.0.0_640x512_1.onnx \
                     images/original \
                     images/output

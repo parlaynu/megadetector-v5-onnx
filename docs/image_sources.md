@@ -8,15 +8,21 @@ a RaspberryPi camera.
 
 The full details of the available options are listed in the table below.
 
-| Value                        | Description                                               |
-|------------------------------|-----------------------------------------------------------|
-| path_to_directory            | load images from files matching the 'extensions'          |
-| path_to_file                 | load and process the single image                         |
-| path_to_video                | load frames from the video                                |
-| path_to_video:start_frame    | seek start_frame position in video and then start reading |
-| picamera2                    | read images from the RaspberryPi camera                   |
-| picamera2:prefix             | from picamera2 and save images with 'prefix' in name      |
-| picamera2:prefix,hflip,vflip | additionally flip the image horizontal/vertical           |
+| Value                         | Description                                               |
+|-------------------------------|-----------------------------------------------------------|
+| path_to_directory             | load images from files matching default 'extensions'      |
+| path_to_directory,ex1,ex2,... | load images from files matching specified 'extensions'    |
+| path_to_file                  | load and process the single image                         |
+| path_to_video                 | load frames from the video                                |
+| path_to_video:start_frame     | seek start_frame position in video and then start reading |
+| picamera2                     | read images from the RaspberryPi camera                   |
+| picamera2:prefix              | save images with 'prefix' in name                         |
+| picamera2:prefix,hflip,vflip  | optionally flip the image horizontal/vertical             |
+| jetson_csi                    | read images from the Jetson CSI camera                    |
+| jetson_csi:prefix             | save images with 'prefix' in name                         |
+| jetson_csi:prefix,hflip,vflip | flip the image horizontal/vertical                        |
+
+Any combination of prefix,hflip,vflip and be used with the camera devices.
 
 
 ## PiCamera2
