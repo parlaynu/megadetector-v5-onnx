@@ -6,11 +6,11 @@ The `run-onnx.py` tool accepts the following arguments:
 
     ./tools/run-onnx.py -h
     usage: run-onnx.py [-h] [-n NUM_BATCHES] [-e EXTENSIONS] [-r] [-p] [-f] [-c] [-a]
-                       model_path image_dir [output_dir]
+                       model_path image_src [output_dir]
                        
     positional arguments:
       model_path            path to model file
-      image_dir             path to images
+      image_src             path to images
       output_dir            path to write output images
       
     optional arguments:
@@ -33,12 +33,16 @@ If an output directory is specified, images with detections are save there with 
 If '-c' is also specified, individual files for the crop areas are also saved. If '-a' is specified, all images are 
 saved, not just those with detections.
 
+For details on the `image_src` parameter, see [this](/docs/image_sources.md).
+
 ## Example
 
 A simple example for using it to process 1 batch of images:
 
-    ./tools/run-onnx.py -n 1 -p -c ../megamodels/md_v5a.0.0_640x512_1.onnx \
-                    images/original images/output
+    ./tools/run-onnx.py -n 1 -p -c \
+                    ../megamodels/md_v5a.0.0_640x512_1.onnx \
+                    images/original \
+                    images/output
     
     preparing session
     - available providers: ['CPUExecutionProvider']
@@ -61,3 +65,5 @@ The output images are:
 
 ![bboxes](/images/processed/DSC04446_0000.jpg)
 ![cropped](/images/processed/DSC04446_0001.jpg)
+
+

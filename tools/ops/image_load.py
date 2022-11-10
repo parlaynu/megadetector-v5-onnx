@@ -12,7 +12,6 @@ def load_images(image_src, recurse, extensions):
     if cidx != -1:
         image_src, start_idx = image_src[:cidx], int(image_src[cidx+1:])
 
-    # 
     if os.path.isfile(image_src):
         yield from _load_from_file(image_src, 0, start_idx)
     

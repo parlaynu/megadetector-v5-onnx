@@ -37,7 +37,14 @@ def build_pipeline(session, args):
     
     batch_size, nchans, height, width = session.get_inputs()[0].shape
     
-    pipe = ops.load_images(args.image_src, args.recurse, args.extensions)
+    if args.image_src.startswith("picamera2"):
+        cidx = args.image_src.find(':', 2)
+        cname = "picam2" if cidx == -1 else args.image_src[cidx+1:]
+        
+        pipe = ops.load_from_picamera2(cname, width, height)
+
+    else:  # fall back to images/videos from disk
+        pipe = ops.load_images(args.image_src, args.recurse, args.extensions)
 
     if batch_size > 1:
         pipe = ops.batcher(pipe, batch_size)
@@ -69,7 +76,7 @@ def main():
     parser.add_argument('-c', '--crop-outputs', help='crop the output into smaller images and save in output dir', action='store_true')
     parser.add_argument('-a', '--save-all', help='save all images, not just those with detections', action='store_true')
     parser.add_argument('model_path', help='path to model file', type=str, default=None)
-    parser.add_argument('image_src', help='path to images or single image or movie[:start_frame]', type=str, default=None)
+    parser.add_argument('image_src', help='source of images - directory, file, or special', type=str, default=None)
     parser.add_argument('output_dir', help='path to write output images', nargs='?', type=str, default=None)
     args = parser.parse_args()
 

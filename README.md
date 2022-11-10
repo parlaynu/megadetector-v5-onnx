@@ -22,7 +22,7 @@ operating system. I documented it this way so I could capture all the software t
 
 I also use it regularly on a MacbookPro x64 running MacOS 11.7.
 
-Follow these [instructions](docs/EXPORT2ONNX.md).
+Follow these [instructions](/docs/export2onnx.md).
 
 
 ## Running Inference
@@ -45,8 +45,10 @@ the pipeline.
 I've tried to keep the code as simple as possible. If you can read python, it should be very easy
 for you to understand what's going on. The `build_pipeline` function is where everything is put together.
 
-Details on using the tool and the output are [here](docs/RUNINFERENCE.md).
+Details on using the tool and the output are [here](/docs/run_inference.md).
 
+The `image_src` parameter can take a number of different forms to specify local storage or camera devices.
+See the [docs](/docs/image_sources.md) for details.
 
 ## Other Tools
 
