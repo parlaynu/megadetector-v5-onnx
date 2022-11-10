@@ -15,7 +15,8 @@ def crop_detections(pipe):
                 x0, x1 = int(p[1] * scale_w), int(p[3] * scale_w)
                 y0, y1 = int(p[0] * scale_h), int(p[2] * scale_h)
                 
-                # check for zero or negative crops
+                # check for zero crops... can happen due to rounding if the
+                #   input image is smaller than the processing resolution
                 if x1 <= x0 or y1 <= y0:
                     continue
 

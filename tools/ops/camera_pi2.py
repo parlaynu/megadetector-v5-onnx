@@ -1,6 +1,4 @@
 from itertools import count
-import time
-from pprint import pprint
 
 
 def load_from_picamera2(params, width, height):
