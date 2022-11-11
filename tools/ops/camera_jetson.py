@@ -25,7 +25,7 @@ def load_from_jetson_csi(params, width, height):
     cam_str = " ".join([f"nvarguscamerasrc sensor-id={device} !",
                 f"video/x-raw(memory:NVMM),width={cap_width},height={cap_height},format=(string)NV12,framerate=(fraction){framerate}/1 !",
                 f"nvvidconv !",
-                f"video/x-raw,width=(int){width},height=(int){height},format=(string)BGRx !",
+                f"video/x-raw,width=(int){cap_width},height=(int){cap_height},format=(string)BGRx !",
                 f"videoconvert !",
                 f"appsink"
                 ])

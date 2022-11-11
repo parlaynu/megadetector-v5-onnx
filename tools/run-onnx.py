@@ -3,11 +3,9 @@ import sys, os
 import time
 from itertools import islice, count
 
-import onnxruntime as ort
-
-
 
 def prepare_session(model_path, force_cpu):
+    import onnxruntime as ort
     from onnxruntime.capi._pybind_state import get_available_providers
     
     sess_options = ort.SessionOptions()
@@ -38,33 +36,34 @@ def build_pipeline(session, args):
     batch_size, nchans, height, width = session.get_inputs()[0].shape
     
     if args.image_src.startswith("picamera2"):
-        cidx = args.image_src.find(':', 2)
         params = []
+        cidx = args.image_src.find(':', 2)
         if cidx != -1:
             params = args.image_src[cidx+1:].split(',')
         pipe = ops.load_from_picamera2(params, width, height)
-
+    
     elif args.image_src.startswith("jetson_csi"):
-        cidx = args.image_src.find(':', 2)
         params = []
+        cidx = args.image_src.find(':', 2)
         if cidx != -1:
             params = args.image_src[cidx+1:].split(',')
         pipe = ops.load_from_jetson_csi(params, width, height)
-        
+    
     else:  # fall back to images/videos from disk
-        cidx = args.image_src.find(',')
         image_src = args.image_src
-        image_exs = ['jpg', 'jpeg']
+        params = ['jpg', 'jpeg']
+        cidx = args.image_src.find(':', 2)
         if cidx != -1:
             image_src = args.image_src[:cidx]
-            image_exs = args.image_src[cidx+1:].split(',')
+            params = args.image_src[cidx+1:].split(',')
         
-        pipe = ops.load_images(image_src, image_exs, args.recurse)
+        pipe = ops.load_images(image_src, params, args.recurse)
+
+    pipe = ops.transform_images(pipe, width, height, nchans, args.preserve_aspect)
 
     if batch_size > 1:
         pipe = ops.batcher(pipe, batch_size)
 
-    pipe = ops.transform_images(pipe, width, height, nchans, args.preserve_aspect)
     pipe = ops.infer(pipe, session)
 
     if args.output_dir is not None:

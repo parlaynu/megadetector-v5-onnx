@@ -4,24 +4,21 @@ from itertools import count
 import cv2
 
 
-def load_images(image_src, image_exs, recurse):
-
-    # extract any starting frame specificier
-    cidx = image_src.find(':', 2)
-    start_idx = 0
-    if cidx != -1:
-        image_src, start_idx = image_src[:cidx], int(image_src[cidx+1:])
+def load_images(image_src, params, recurse):
 
     if os.path.isfile(image_src):
+        start_idx = 0 if len(params) == 0 else int(params[0])
         yield from _load_from_file(image_src, 0, start_idx)
     
     elif os.path.isdir(image_src):
-        yield from _load_from_dir(image_src, image_exs, recurse)
+        yield from _load_from_dir(image_src, params, recurse)
     
 
 def _load_from_dir(image_src, image_exs, recurse):
     
-    image_exs = {"."+e.lower() for e in image_exs}
+    # format the extensions ready for checking
+    image_exs = {e.lstrip(".").lower() for e in image_exs}  # get all extensions to known state
+    image_exs = {"." + e for e in image_exs} # add back the leading '.'
 
     dirs = list()
     dirs.append(image_src)

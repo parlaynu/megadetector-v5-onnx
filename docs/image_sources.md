@@ -11,7 +11,7 @@ The full details of the available options are listed in the table below.
 | Value                         | Description                                               |
 |-------------------------------|-----------------------------------------------------------|
 | path_to_directory             | load images from files matching default 'extensions'      |
-| path_to_directory,ex1,ex2,... | load images from files matching specified 'extensions'    |
+| path_to_directory:ex1,ex2,... | load images from files matching specified 'extensions'    |
 | path_to_file                  | load and process the single image                         |
 | path_to_video                 | load frames from the video                                |
 | path_to_video:start_frame     | seek start_frame position in video and then start reading |
