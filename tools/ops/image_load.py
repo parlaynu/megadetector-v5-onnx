@@ -22,7 +22,7 @@ def _load_from_dir(image_src, image_exs, recurse):
 
     dirs = list()
     dirs.append(image_src)
-    
+
     idx = 0
     while(len(dirs) > 0):
         dpath = dirs.pop()

@@ -3,14 +3,19 @@
 This project explains how to export the [Megadetector V5](https://github.com/microsoft/CameraTraps/blob/main/megadetector.md) 
 models to ONNX format, and provides some tools to easily run inference using the ONNX model.
 
-The two main reasons I had for doing this:
+The main reason I had for doing this was to make it easier to run on a range of platformss. In most cases, once you
+have your model, just run a `pip install onnxruntime` (or onnxruntime-gpu or onnxruntime-openvine or ...) and with
+the tools in this repository, you're ready to go. To make it easier, I've included an implementation of the 
+non-maximum-suppression algorithm implemented in `numpy` so there's no need to for `pytorch` or any other library for that.
 
-* easier to run on a edge devices - fewer dependencies
-* support for a wider range of devices - via the OpenVINO execution provider
+The exporting can be complicated, but you can export the model on any platform where all the requirements are readily 
+satisfied, and then run inference on another with just the minimal dependencies.
 
-The downside is that you need to specify the image resolution and batch size at the conversion time; if you
+One of the downsides is that you need to specify the image resolution and batch size at the conversion time; if you
 want to change either, you need to re-export.
 
+Additionally, not all platforms have prebuilt `onnxruntime` packages available. I've had to build from source for a few
+platforms and it can be challenging. I'll add notes for some soon.
 
 ## Exporting to ONNX
 

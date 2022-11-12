@@ -4,23 +4,25 @@ import cv2
 
 def load_from_jetson_csi(params, width, height):
 
-    # parse the parameters
+    # default settings
     cam_name = "nano_csi"
     hflip = vflip = False
-    
+    device = 0
+    cap_width = 1920
+    cap_height = 1080
+    framerate = 30
+
+    # parse the parameters
     for param in params:
         param = param.lower()
         if param == "hflip":
             hflip = True
         elif param == "vflip":
             vflip = True
+        elif param == "0" or param == "1":
+            device = int(param)
         else:
             cam_name = param
-    
-    device = 0
-    cap_width = 1920
-    cap_height = 1080
-    framerate = 30
     
     cam_str = " ".join([f"nvarguscamerasrc sensor-id={device} !",
                 f"video/x-raw(memory:NVMM),width={cap_width},height={cap_height},format=(string)NV12,framerate=(fraction){framerate}/1 !",

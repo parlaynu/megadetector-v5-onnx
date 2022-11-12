@@ -19,10 +19,10 @@ def non_max_suppression(pred, conf_thresh=0.25, iou_thresh=0.45):
     pred[..., :4] = xywh2xyxy(pred[..., :4])
 
     # run the nms
-    return _nms(pred, conf_thresh, iou_thresh, [])
+    return _nms(pred, iou_thresh, [])
 
 
-def _nms(pred, conf_thresh, iou_thresh, npred):
+def _nms(pred, iou_thresh, npred):
     
     if len(pred) == 0:
         return npred
@@ -43,7 +43,7 @@ def _nms(pred, conf_thresh, iou_thresh, npred):
     # get the remaining predictions
     pp = px[ious < iou_thresh]
 
-    return _nms(pp, conf_thresh, iou_thresh, npred)
+    return _nms(pp, iou_thresh, npred)
 
 
 def calc_ious(b0, bx):

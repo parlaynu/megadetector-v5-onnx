@@ -1,11 +1,9 @@
 from .nms import non_max_suppression
 
 
-def infer(pipe, sess):
+def infer(pipe, sess, conf_thresh, iou_thresh):
 
-    detection_threshold = 0.005
     for item in pipe:
-        print(f"- processing image")
         inp = item['input']
 
         # run the forward pass
@@ -16,7 +14,7 @@ def infer(pipe, sess):
         
         preds = []
         for idx, p in enumerate(pred[0]):
-            p = non_max_suppression(p)
+            p = non_max_suppression(p, conf_thresh, iou_thresh)
             print(f"- {idx:02d}: found {len(p)} objects")
             preds.append(p)
             
