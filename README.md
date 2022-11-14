@@ -8,19 +8,29 @@ have your model, just run a `pip install onnxruntime` (or onnxruntime-gpu or onn
 the tools in this repository, you're ready to go. To further reduce external dependencies, I've included an implementation 
 of the batched non-maximum-suppression algorithm implemented in `numpy`.
 
-The exporting can be complicated, but you can export the model on any platform where all the requirements are readily 
+The exporting can be complicated, but you can export the ONNX model on any platform where all the requirements are readily 
 satisfied, and then run inference on another with just the minimal dependencies.
 
-One of the downsides is that you need to specify the image resolution and batch size at the conversion time; if you
-want to change either, you need to re-export.
+There are also instructions on converting the ONNX model to TensorRT to run on Nvidia GPUs and a tool for running
+inference using TensorRT.
+
+The images used as input for inference can come from a number of sources, including:
+
+* image files on disk
+* video files on disk
+* hierarchies of image and/or video files on disk
+* from RaspberryPi camera
+* from Jetson Nano CSI camera
+
+Details on how to specify these sources are found in the 'Running Inference' document linked below.
 
 Detailed documents for each step can be found at the following links:
 
-* [Running Inference](/docs/run_inference.md)
 * [Exporting to ONNX](/docs/export2onnx.md)
 * [Exporting to TensorRT](/docs/onnx2tensorrt.md)
-* [Platform Notes](/docs/platform_notes.md)
+* [Running Inference](/docs/run_inference.md)
 * [Other Tools](/docs/other_tools.md)
+* [Platform Notes](/docs/platform_notes.md)
 
 ## What Does It Do?
 
@@ -117,7 +127,8 @@ Run the inference:
     -       average: 6.91
     
 
-The resulting outputs are:
+The resulting outputs are below. The first image is the full input with bounding boxes around the animals;
+the second row has the individual animals cut into separate images.
 
 <table>
     <tr>
