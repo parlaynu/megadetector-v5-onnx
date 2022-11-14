@@ -121,11 +121,11 @@ The resulting outputs are:
 
 <table>
     <tr>
-        <td colspan="2">![zebras](/images/outputs/DSC04446_0000.jpg)</td>
+        <td colspan="2"><img src="images/outputs/DSC04446_0000.jpg"></td>
     </tr>
     <tr>
-        <td>![zebra1](/images/outputs/DSC04446_0001.jpg)</td>
-        <td>![zebra1](/images/outputs/DSC04446_0002.jpg)</td>
+        <td><img src="images/outputs/DSC04446_0001.jpg"></td>
+        <td><img src="images/outputs/DSC04446_0002.jpg"></td>
     </tr>
 </table>
 
