@@ -9,6 +9,11 @@ from .image_transform import transform_images
 
 from .infer import infer
 
+try:
+    from .infer_trt import infer_trt
+except ImportError:
+    pass
+
 from .bboxes import draw_bboxes
 from .cut_objects import cut_objects
 
