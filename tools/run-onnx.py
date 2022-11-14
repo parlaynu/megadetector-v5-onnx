@@ -58,7 +58,7 @@ def build_pipeline(session, args):
             params = args.image_src[cidx+1:].split(',')
             args.image_src = args.image_src[:cidx]
         
-        pipe = ops.load_images(args.image_src, params, args.recurse)
+        pipe = ops.load_images(args.image_src, params)
 
     pipe = ops.transform_images(pipe, width, height, nchans, args.preserve_aspect)
 
@@ -92,7 +92,6 @@ def main():
     parser.add_argument('-a', '--save-all', help='save all images, not just those with detections', action='store_true')
     parser.add_argument('-p', '--preserve-aspect', help='preserve image aspect ratio (pad if needed)', action='store_true')
     parser.add_argument('-x', '--cut-objects', help='cut detected objects from full image and save as individual images', action='store_true')
-    parser.add_argument('-r', '--recurse', help='recursively search directory for images', action='store_true')
     parser.add_argument('-t', '--conf-thresh', help='confidence threshold for nms', type=float, default=0.25)
     parser.add_argument('-u', '--iou-thresh', help='iou threshold for nms', type=float, default=0.45)
     parser.add_argument('model_path', help='path to model file', type=str, default=None)

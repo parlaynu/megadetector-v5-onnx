@@ -34,6 +34,7 @@ The table below has the details.
 | Value                         | Description                                               |
 |-------------------------------|-----------------------------------------------------------|
 | path_to_directory             | load images from files matching default 'extensions'      |
+| path_to_directory/...         | search full directory hierarchy for images                |
 | path_to_directory:ex1,ex2,... | load images from files matching specified 'extensions'    |
 | path_to_file                  | load and process the single image                         |
 | path_to_video                 | load frames from the video                                |

@@ -4,13 +4,10 @@ import time
 from itertools import islice, count
 
 
-
 def build_pipeline(args):
     import ops
     
     print("building pipeline")
-    # print(f"- input shape: {session.get_inputs()[0].shape}")
-    # print(f"- output shape: {session.get_outputs()[0].shape}")
     
     batch_size, nchans, height, width = args.batch_size, 3, args.height, args.width
     
@@ -37,7 +34,7 @@ def build_pipeline(args):
             params = args.image_src[cidx+1:].split(',')
             args.image_src = args.image_src[:cidx]
         
-        pipe = ops.load_images(args.image_src, params, args.recurse)
+        pipe = ops.load_images(args.image_src, params)
 
     pipe = ops.transform_images(pipe, width, height, nchans, args.preserve_aspect)
 
@@ -50,7 +47,6 @@ def build_pipeline(args):
         pipe = ops.draw_bboxes(pipe)
         if args.cut_objects:
             pipe = ops.cut_objects(pipe)
-
 
         if args.image_src is None:
             src_dir = None
@@ -70,7 +66,6 @@ def main():
     parser.add_argument('-a', '--save-all', help='save all images, not just those with detections', action='store_true')
     parser.add_argument('-p', '--preserve-aspect', help='preserve image aspect ratio (pad if needed)', action='store_true')
     parser.add_argument('-x', '--cut-objects', help='cut detected objects from full image and save as individual images', action='store_true')
-    parser.add_argument('-r', '--recurse', help='recursively search directory for images', action='store_true')
     parser.add_argument('-t', '--conf-thresh', help='confidence threshold for nms', type=float, default=0.25)
     parser.add_argument('-u', '--iou-thresh', help='iou threshold for nms', type=float, default=0.45)
     parser.add_argument('-b', '--batch_size', help='batch size', type=int, default=1)

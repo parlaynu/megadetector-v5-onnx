@@ -4,8 +4,13 @@ from itertools import count
 import cv2
 
 
-def load_images(image_src, params, recurse):
+def load_images(image_src, params):
 
+    recurse = False
+    if image_src.endswith("/..."):
+        recurse = True
+        image_src = image_src[:-4]
+    
     if os.path.isfile(image_src):
         start_idx = 0 if len(params) == 0 else int(params[0])
         yield from _load_from_file(image_src, 0, start_idx)

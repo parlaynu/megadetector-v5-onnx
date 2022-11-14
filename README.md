@@ -4,9 +4,11 @@ This project explains how to export the [Megadetector V5](https://github.com/mic
 models to ONNX format, and provides some tools to easily run inference using the ONNX model.
 
 The main reason I had for doing this was to make it easier to run on a range of platformss. In most cases, once you
-have your model, just run a `pip install onnxruntime` (or onnxruntime-gpu or onnxruntime-openvino or ...) and with
-the tools in this repository, you're ready to go. To further reduce external dependencies, I've included an implementation 
-of the batched non-maximum-suppression algorithm implemented in `numpy`.
+have your model, just run a `pip install -r requirements.txt` (or requirements-gpu.txt or requirements-openvino.txt) and with
+the tools in this repository, you're ready to go. 
+
+To further reduce external dependencies, I've included an implementation of the batched non-maximum-suppression algorithm 
+implemented in `numpy`.
 
 The exporting can be complicated, but you can export the ONNX model on any platform where all the requirements are readily 
 satisfied, and then run inference on another with just the minimal dependencies.
