@@ -4,9 +4,9 @@ This project explains how to export the [Megadetector V5](https://github.com/mic
 models to ONNX format, and provides some tools to easily run inference using the ONNX model.
 
 The main reason I had for doing this was to make it easier to run on a range of platformss. In most cases, once you
-have your model, just run a `pip install onnxruntime` (or onnxruntime-gpu or onnxruntime-openvine or ...) and with
-the tools in this repository, you're ready to go. To make it easier, I've included an implementation of the 
-non-maximum-suppression algorithm implemented in `numpy` so there's no need to for `pytorch` or any other library for that.
+have your model, just run a `pip install onnxruntime` (or onnxruntime-gpu or onnxruntime-openvino or ...) and with
+the tools in this repository, you're ready to go. To further reduce external dependencies, I've included an implementation 
+of the batched non-maximum-suppression algorithm implemented in `numpy`.
 
 The exporting can be complicated, but you can export the model on any platform where all the requirements are readily 
 satisfied, and then run inference on another with just the minimal dependencies.
@@ -14,81 +14,120 @@ satisfied, and then run inference on another with just the minimal dependencies.
 One of the downsides is that you need to specify the image resolution and batch size at the conversion time; if you
 want to change either, you need to re-export.
 
-Additionally, not all platforms have prebuilt `onnxruntime` packages available. I've had to build from source for a few
-platforms and it can be challenging. I'll add notes for some soon.
+Detailed documents for each step can be found at the following links:
 
-## Exporting to ONNX
+* [Running Inference](/docs/run_inference.md)
+* [Exporting to ONNX](/docs/export2onnx.md)
+* [Exporting to TensorRT](/docs/onnx2tensorrt.md)
+* [Platform Notes](/docs/platform_notes.md)
+* [Other Tools](/docs/other_tools.md)
 
-This is reasonably complicated as there are a lot of dependencies to manage and some of them are getting
-reasonably old.
+## What Does It Do?
 
-The document linked to explains how to make it work on a RaspberryPi 4b 8G with a clean install of the
-operating system. I documented it this way so I could capture all the software that was needed.
+Here's a full run through of the environment setup and running inference on a RaspberryPi 4b with 8GBytes of RAM. 
 
-I also use it regularly on a MacbookPro x64 running MacOS 11.7.
+It uses an ONNX model already exported (using the instructions in the link above) and available as below. This model
+expects image inputs of resolution 640x512 and a batch size of a single image; the `run-onnx.py` tool can determine
+this from the model (from the actual model, not its name) and resizes them accordingly.
 
-Follow these [instructions](/docs/export2onnx.md).
+    $ ls -l models
+    total 547220
+    -rw-r--r-- 1 pi pi 560346651 Nov 15 08:26 md_v5a.0.0_640x512_1.onnx
 
+Clone this repository:
 
-## Running Inference
+    $ git clone https://github.com/parlaynu/megadetector-v5-onnx.git
+    Cloning into 'megadetector-v5-onnx'...
+    remote: Enumerating objects: 148, done.
+    remote: Counting objects: 100% (148/148), done.
+    remote: Compressing objects: 100% (106/106), done.
+    remote: Total 148 (delta 92), reused 97 (delta 41), pack-reused 0
+    Receiving objects: 100% (148/148), 2.37 MiB | 285.00 KiB/s, done.
+    Resolving deltas: 100% (92/92), done.
 
-It's very simple to run inference with the model once the export has happened.
+Create virtual environment:
 
-From the root of this repository, run these three steps to setup the environment:
+    $ python3.9 -m venv pyenv
+    $ source pyenv/bin/activate
 
-    python3.9 -m venv pyenv
-    source pyenv/bin/activate
-    pip install -r requirements.txt
+Install dependencies:
 
-To run on Nvidia GPUs using CUDA and/or TensorRT, install the from `requirements-gpu.txt`.
-To run using OpenVINO, install from `requirements-openvino.txt`.
+    $ cd megadetector-v5-onnx/
+    $ pip install -r requirements.txt 
+    Looking in indexes: https://pypi.org/simple, https://www.piwheels.org/simple
+    Collecting numpy==1.23.4
+      Downloading numpy-1.23.4-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (14.0 MB)
+         |████████████████████████████████| 14.0 MB 6.1 MB/s 
+    Collecting opencv-python-headless==4.6.0.66
+      Downloading opencv_python_headless-4.6.0.66-cp36-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (27.2 MB)
+         |████████████████████████████████| 27.2 MB 82 kB/s 
+    Collecting onnx==1.12.0
+      Downloading onnx-1.12.0-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (13.0 MB)
+         |████████████████████████████████| 13.0 MB 7.1 MB/s 
+    Collecting onnxruntime==1.13.1
+      Downloading onnxruntime-1.13.1-cp39-cp39-manylinux_2_27_aarch64.whl (4.3 MB)
+         |████████████████████████████████| 4.3 MB 8.6 MB/s 
+    Collecting typing-extensions>=3.6.2.1
+      Downloading https://www.piwheels.org/simple/typing-extensions/typing_extensions-4.4.0-py3-none-any.whl (26 kB)
+    Collecting protobuf<=3.20.1,>=3.12.2
+      Downloading protobuf-3.20.1-cp39-cp39-manylinux2014_aarch64.whl (917 kB)
+         |████████████████████████████████| 917 kB 6.0 MB/s 
+    Collecting flatbuffers
+      Downloading https://www.piwheels.org/simple/flatbuffers/flatbuffers-20181003210633-py2.py3-none-any.whl (14 kB)
+    Collecting coloredlogs
+      Downloading https://www.piwheels.org/simple/coloredlogs/coloredlogs-15.0.1-py2.py3-none-any.whl (46 kB)
+         |████████████████████████████████| 46 kB 87 kB/s 
+    Collecting sympy
+      Downloading https://www.piwheels.org/simple/sympy/sympy-1.11.1-py3-none-any.whl (6.5 MB)
+         |████████████████████████████████| 6.5 MB 772 kB/s 
+    Collecting packaging
+      Downloading https://www.piwheels.org/simple/packaging/packaging-21.3-py3-none-any.whl (40 kB)
+         |████████████████████████████████| 40 kB 1.1 MB/s 
+    Collecting humanfriendly>=9.1
+      Downloading https://www.piwheels.org/simple/humanfriendly/humanfriendly-10.0-py2.py3-none-any.whl (89 kB)
+         |████████████████████████████████| 89 kB 1.9 MB/s 
+    Collecting pyparsing!=3.0.5,>=2.0.2
+      Downloading https://www.piwheels.org/simple/pyparsing/pyparsing-3.0.9-py3-none-any.whl (98 kB)
+         |████████████████████████████████| 98 kB 322 kB/s 
+    Collecting mpmath>=0.19
+      Downloading https://www.piwheels.org/simple/mpmath/mpmath-1.2.1-py3-none-any.whl (532 kB)
+         |████████████████████████████████| 532 kB 376 kB/s 
+    Installing collected packages: pyparsing, mpmath, humanfriendly, typing-extensions, sympy, protobuf, packaging, numpy, flatbuffers, coloredlogs, opencv-python-headless, onnxruntime, onnx
+    Successfully installed coloredlogs-15.0.1 flatbuffers-20181003210633 humanfriendly-10.0 mpmath-1.2.1 numpy-1.23.4 onnx-1.12.0 onnxruntime-1.13.1 opencv-python-headless-4.6.0.66 packaging-21.3 protobuf-3.20.1 pyparsing-3.0.9 sympy-1.11.1 typing-extensions-4.4.0
 
-The tool `run-onnx.py` is used to run inference. It builds a pipeline of operations based on the
-command line arguments passed in, and runs the pipeline. It uses generator functions to build
-the pipeline.
+Run the inference:
 
-I've tried to keep the code as simple as possible. If you can read python, it should be very easy
-for you to understand what's going on. The `build_pipeline` function is where everything is put together.
+    $ ./tools/run-onnx.py -p -x -r \
+                    ../models/md_v5a.0.0_640x512_1.onnx \
+                    ./images/original \
+                    ../outputs
+    preparing session
+    - available providers: ['CPUExecutionProvider']
+    - in use providers: ['CPUExecutionProvider']
+    building pipeline
+    - input shape: [1, 3, 512, 640]
+    - output shape: [1, 20400, 8]
+    running
+    000000 loading ./images/original/DSC04446.jpg
+    - resizing from 2048x1365 to 640x426
+    - padding from 640x426 to 640x512
+    - 00: found 2 objects
+    summary
+    - total runtime: 6.91
+    -       average: 6.91
+    
 
-Details on using the tool and the output are [here](/docs/run_inference.md).
+The resulting outputs are:
 
-The `image_src` parameter can take a number of different forms to specify local storage or camera devices.
-See the [docs](/docs/image_sources.md) for details.
-
-## Other Tools
-
-### Model Checking
-
-The tool `check-onnx.py` checks the model using the builtin checker from the onnx library.
-
-    ./tools/check-onnx.py <path-to-model-file>
-
-If the tool finds a problem, an exception is thrown.
-
-### Model Information
-
-The tool `model-info.py` displays information about the inputs and outputs from the model.
-
-    ./tools/model-info.py <path-to-model-file>
-
-An example output is:
-
-    ./tools/model-info.py ../megamodels/md_v5a.0.0_640x512_1.onnx
-    inputs
-      00: name: images, shape: [1, 3, 512, 640], type: tensor(float)
-    outputs
-      00: name: output, shape: [1, 20400, 8], type: tensor(float)
-
-### Model Optimizing
-
-This tool optimizes the model using [onnxoptimizer](https://github.com/onnx/optimizer).
-
-    ./tools/optimize-onnx.py <path-to-model-file>
-
-It saves a version of the model in the same location as the source, but with `_opt` added to the file name.
-
-I haven't seen much of a gain using this, but leaving it here just in case.
-
+<table>
+    <tr>
+        <td colspan="2">![zebras](/images/outputs/DSC04446_0000.jpg)</td>
+    </tr>
+    <tr>
+        <td>![zebra1](/images/outputs/DSC04446_0001.jpg)</td>
+        <td>![zebra1](/images/outputs/DSC04446_0002.jpg)</td>
+    </tr>
+</table>
 
 ## References
 

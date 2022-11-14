@@ -1,5 +1,53 @@
 # Running Inference
 
+It's very simple to run inference with the model once the export has happened.
+
+From the root of this repository, run these three steps to setup the environment:
+
+    python3.9 -m venv pyenv
+    source pyenv/bin/activate
+    pip install -r requirements.txt
+
+To run on Nvidia GPUs using CUDA and/or TensorRT, install the from `requirements-gpu.txt`.
+To run using OpenVINO, install from `requirements-openvino.txt`.
+
+The tool `run-onnx.py` is used to run inference. It builds a pipeline of operations based on the
+command line arguments passed in, and runs the pipeline. It uses generator functions to build
+the pipeline.
+
+I've tried to keep the code as simple as possible. If you can read python, it should be very easy
+for you to understand what's going on. The `build_pipeline` function is where everything is put together.
+
+Details on using the tool and the output are [here](/docs/run_inference.md).
+
+The `image_src` parameter can take a number of different forms to specify local storage or camera devices.
+See the [docs](/docs/image_sources.md) for details.
+
+## Image Source Specification
+
+The `run-onnx.py` and `run-trt.py` tools have an `image_src` parameter which can be used to specify the source of images
+for inference. This can be on disk image files, video files or directory hierarchies of image/video files, and 
+camera devices.
+
+The table below has the details.
+
+| Value                         | Description                                               |
+|-------------------------------|-----------------------------------------------------------|
+| path_to_directory             | load images from files matching default 'extensions'      |
+| path_to_directory:ex1,ex2,... | load images from files matching specified 'extensions'    |
+| path_to_file                  | load and process the single image                         |
+| path_to_video                 | load frames from the video                                |
+| path_to_video:start_frame     | seek start_frame position in video and then start reading |
+| picamera2                     | read images from the RaspberryPi camera                   |
+| picamera2:prefix              | save images with 'prefix' in name                         |
+| picamera2:prefix,hflip,vflip  | optionally flip the image horizontal/vertical             |
+| jetson_csi                    | read images from the Jetson CSI camera                    |
+| jetson_csi:prefix             | save images with 'prefix' in name                         |
+| jetson_csi:prefix,hflip,vflip | flip the image horizontal/vertical                        |
+
+Any combination of prefix,hflip,vflip and be used with the camera devices.
+
+
 ## Tool Overview
 
 The `run-onnx.py` tool accepts the following arguments:
