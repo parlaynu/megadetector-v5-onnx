@@ -34,11 +34,14 @@ def build_pipeline(session, args):
     batch_size, nchans, height, width = session.get_inputs()[0].shape
     
     # check for dynamic model
-    if isinstance(batch_size, str):
+    dynamic = isinstance(batch_size, str)
+    if dynamic:
         batch_size, height, width = args.batch_size, args.height, args.width
     
     print(f"- input shape: {batch_size} {nchans} {height} {width}")
-    print(f"- output shape: {session.get_outputs()[0].shape}")
+    
+    if not dynamic:
+        print(f"- output shape: {session.get_outputs()[0].shape}")
 
     if args.image_src.startswith("picamera2"):
         params = []
