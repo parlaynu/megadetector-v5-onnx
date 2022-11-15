@@ -5,22 +5,26 @@ def cut_objects(pipe):
     for item in pipe:
 
         outputs = []
-        for src, img, oup, pred in zip(item['original_image'], item['image'], item['output'], item['pred']):
-            sw, sh, _ = src.shape
-            iw, ih, _ = img.shape
-            scale_w, scale_h = sw/iw, sh/ih
+        for src, offset, img, oup, pred in zip(item['original_image'], item['offset'], item['image'], item['output'], item['pred']):
+            sh, sw, _ = src.shape
+            ih, iw, _ = img.shape
+            oh, ow = offset
+
+            scale_w, scale_h = sw/(iw - 2*ow), sh/(ih - 2*oh)
         
             crops = [oup]
             for p in pred:
-                x0, x1 = int(p[1] * scale_w), int(p[3] * scale_w)
-                y0, y1 = int(p[0] * scale_h), int(p[2] * scale_h)
+                x1, y1, x2, y2 = p[:4]
+
+                x1, y1 = int((x1 - ow) * scale_w), int((y1 - oh) * scale_h)
+                x2, y2 = int((x2 - ow) * scale_w), int((y2 - oh) * scale_h)
                 
                 # check for zero crops... can happen due to rounding if the
                 #   input image is smaller than the processing resolution
-                if x1 <= x0 or y1 <= y0:
+                if x2 <= x1 or y2 <= y1:
                     continue
 
-                cropped = src[x0:x1, y0:y1]
+                cropped = src[y1:y2, x1:x2]
                 crops.append(cropped)
             
             outputs.append(crops)

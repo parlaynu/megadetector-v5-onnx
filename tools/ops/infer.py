@@ -8,7 +8,7 @@ def infer(pipe, sess, conf_thresh, iou_thresh):
 
         # run the forward pass
         pred = sess.run(None, {'images': inp})
-
+        
         # NMS returns a list of predictions... one tensor for each baatch entry
         # - 6 items per prediction: x1, y1, x2, y2, conf, cls
         
