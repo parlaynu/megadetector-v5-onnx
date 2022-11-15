@@ -30,11 +30,16 @@ def build_pipeline(session, args):
     import ops
     
     print("building pipeline")
-    print(f"- input shape: {session.get_inputs()[0].shape}")
-    print(f"- output shape: {session.get_outputs()[0].shape}")
-    
+        
     batch_size, nchans, height, width = session.get_inputs()[0].shape
     
+    # check for dynamic model
+    if isinstance(batch_size, str):
+        batch_size, height, width = args.batch_size, args.height, args.width
+    
+    print(f"- input shape: {batch_size} {nchans} {height} {width}")
+    print(f"- output shape: {session.get_outputs()[0].shape}")
+
     if args.image_src.startswith("picamera2"):
         params = []
         cidx = args.image_src.find(':', 2)
@@ -94,6 +99,9 @@ def main():
     parser.add_argument('-x', '--cut-objects', help='cut detected objects from full image and save as individual images', action='store_true')
     parser.add_argument('-t', '--conf-thresh', help='confidence threshold for nms', type=float, default=0.25)
     parser.add_argument('-u', '--iou-thresh', help='iou threshold for nms', type=float, default=0.45)
+    parser.add_argument('-B', '--batch_size', help='batch size for dynamic model', type=int, default=1)
+    parser.add_argument('-W', '--width', help='processing width for dynamic model', type=int, default=640)
+    parser.add_argument('-H', '--height', help='processing height for dynamic model', type=int, default=512)
     parser.add_argument('model_path', help='path to model file', type=str, default=None)
     parser.add_argument('image_src', help='source of images - directory, file, or special', type=str, default=None)
     parser.add_argument('output_dir', help='path to write output images', nargs='?', type=str, default=None)
@@ -101,6 +109,8 @@ def main():
 
     sess = prepare_session(args.model_path, args.force_cpu)
     pipe = build_pipeline(sess, args)
+    if pipe is None:
+        return
 
     start = time.time()
     
