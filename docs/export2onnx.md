@@ -1,4 +1,4 @@
-# MegadetectorV5: Export to ONNX
+# Export to ONNX
 
 This is reasonably complicated as there are a lot of dependencies to manage and some of them are getting
 reasonably old.
