@@ -7,8 +7,8 @@ The main reason I had for doing this was to make it easier to run on a range of 
 have your model, just run a `pip install -r requirements.txt` (or requirements-gpu.txt or requirements-openvino.txt) and with
 the tools in this repository, you're ready to go. 
 
-To further reduce external dependencies, I've included an implementation of the batched non-maximum-suppression algorithm 
-implemented in `numpy`.
+To further reduce external dependencies, there is also included an implementation of the batched non-maximum-suppression 
+algorithm implemented in `numpy`.
 
 The exporting can be complicated, but you can export the ONNX model on any platform where all the requirements are readily 
 satisfied, and then run inference on another with just the minimal dependencies.

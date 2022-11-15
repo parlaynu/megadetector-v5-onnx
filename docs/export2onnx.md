@@ -93,7 +93,8 @@ For example, exporting model-a for dynamic inputs:
 
 ## Optional: Optimize the Model
 
-You can optionally use the `tools/optimize-onnx.py` script to optimize the model. 
+You can optionally use the `tools/optimize-onnx.py` script to optimize the model. It uses
+[onnxoptimizer](https://github.com/onnx/optimizer) to generate an optimized version of the model.
 
 It didn't seem to improve times very much in my testing.
 
