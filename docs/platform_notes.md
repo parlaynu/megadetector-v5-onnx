@@ -1,6 +1,6 @@
-# WIP
+#  Notes on Specific Platforms
 
-## PiCamera2
+## Raspberry Pi with PiCamera2
 
 The PiCamera2 complicates the installation a little - it is available on pypi.org however, not all of
 its dependencies are there. The only way to install it is using a system level package, so that means
@@ -13,7 +13,6 @@ This can be done with the following:
     pip3 install --user -r requirements.txt
 
 To use the camera, run the tool with a command line like:
-
 
     ./tools/run-onnx.py -n 3 -p -c ../megamodels/md_v5a.0.0_640x512_1.onnx \
                     picamera2:mycamera \
@@ -30,6 +29,4 @@ The general form is:
 
     <prefix>_<image_id>_0000.jpg - this is the full image with bounding boxes
     <prefix>_<image_id>_XXXX.jpg - these are the crops taken from the image
-
-
 
