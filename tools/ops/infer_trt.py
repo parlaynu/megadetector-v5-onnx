@@ -26,11 +26,9 @@ def infer_trt(pipe, args):
             h_input = np.empty(shape=[size], dtype=np.float32)
             # cuda.pagelocked_empty(shape=[size], dtype=np.float32)
             d_input = cuda.mem_alloc(h_input.nbytes)
-            print(f'input: {type(h_input)} {h_input.nbytes}')
         else:
             h_output = cuda.pagelocked_empty(shape=[size], dtype=np.float32)
             d_output = cuda.mem_alloc(h_output.nbytes)
-            print(f"output: {type(h_output)} {h_output.nbytes}")
         
     bindings = [int(d_input), int(d_output)]
     
@@ -39,14 +37,15 @@ def infer_trt(pipe, args):
     
     for item in pipe:
         h_input = item['input']
-
+        
         # run the forward pass
         cuda.memcpy_htod_async(d_input, h_input, stream)
         context.execute_async_v2(bindings, stream.handle, None)
         cuda.memcpy_dtoh_async(h_output, d_output, stream)
         stream.synchronize()
         
-        pred = np.reshape(h_output, (1, -1, 8))
+        # reshape the predictions into batches
+        pred = np.reshape(h_output, (h_input.shape[0], -1, 8))
         
         # NMS returns a list of predictions... one tensor for each baatch entry
         # - 6 items per prediction: x1, y1, x2, y2, conf, cls

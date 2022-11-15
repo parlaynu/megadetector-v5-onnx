@@ -16,6 +16,10 @@ def prepare_session(model_path, force_cpu):
     print(f"preparing session", flush=True)
     providers = get_available_providers()
     print(f"- available providers: {providers}")
+    
+    # converting to Tensor here takes a long time and the CUDA operator is just as fast. If you
+    # really want to use TensorRT, then create a TensorRT model and use `run-trt.py`.
+    providers = [p for p in providers if p != 'TensorrtExecutionProvider']
 
     if force_cpu:
         providers = ['CPUExecutionProvider']
@@ -37,6 +41,14 @@ def build_pipeline(session, args):
     dynamic = isinstance(batch_size, str)
     if dynamic:
         batch_size, height, width = args.batch_size, args.height, args.width
+        if batch_size == -1 or height == -1 or width == -1:
+            print("Error: must specify batch_size, width and height for dynamic models")
+            return None
+    
+    else:
+        if args.batch_size != -1 or args.height != -1 or args.width != -1:
+            print("Error: can not specify batch_size, width or height for static models")
+            return None
     
     print(f"- input shape: {batch_size} {nchans} {height} {width}")
     
@@ -68,11 +80,10 @@ def build_pipeline(session, args):
         
         pipe = ops.load_images(args.image_src, params)
 
-    pipe = ops.transform_images(pipe, width, height, nchans, args.preserve_aspect)
-
     if batch_size > 1:
         pipe = ops.batcher(pipe, batch_size)
 
+    pipe = ops.transform_images(pipe, width, height, nchans, args.preserve_aspect)
     pipe = ops.infer(pipe, session, args.conf_thresh, args.iou_thresh)
 
     if args.output_dir is not None:
@@ -102,9 +113,9 @@ def main():
     parser.add_argument('-x', '--cut-objects', help='cut detected objects from full image and save as individual images', action='store_true')
     parser.add_argument('-t', '--conf-thresh', help='confidence threshold for nms', type=float, default=0.25)
     parser.add_argument('-u', '--iou-thresh', help='iou threshold for nms', type=float, default=0.45)
-    parser.add_argument('-B', '--batch_size', help='batch size for dynamic model', type=int, default=1)
-    parser.add_argument('-W', '--width', help='processing width for dynamic model', type=int, default=640)
-    parser.add_argument('-H', '--height', help='processing height for dynamic model', type=int, default=512)
+    parser.add_argument('-B', '--batch_size', help='batch size for dynamic model', type=int, default=-1)
+    parser.add_argument('-W', '--width', help='processing width for dynamic model', type=int, default=-1)
+    parser.add_argument('-H', '--height', help='processing height for dynamic model', type=int, default=-1)
     parser.add_argument('model_path', help='path to model file', type=str, default=None)
     parser.add_argument('image_src', help='source of images - directory, file, or special', type=str, default=None)
     parser.add_argument('output_dir', help='path to write output images', nargs='?', type=str, default=None)

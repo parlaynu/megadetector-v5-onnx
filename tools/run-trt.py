@@ -36,11 +36,10 @@ def build_pipeline(args):
         
         pipe = ops.load_images(args.image_src, params)
 
-    pipe = ops.transform_images(pipe, width, height, nchans, args.preserve_aspect)
-
     if batch_size > 1:
         pipe = ops.batcher(pipe, batch_size)
 
+    pipe = ops.transform_images(pipe, width, height, nchans, args.preserve_aspect)
     pipe = ops.infer_trt(pipe, args)
 
     if args.output_dir is not None:
@@ -68,13 +67,17 @@ def main():
     parser.add_argument('-x', '--cut-objects', help='cut detected objects from full image and save as individual images', action='store_true')
     parser.add_argument('-t', '--conf-thresh', help='confidence threshold for nms', type=float, default=0.25)
     parser.add_argument('-u', '--iou-thresh', help='iou threshold for nms', type=float, default=0.45)
-    parser.add_argument('-B', '--batch_size', help='batch size', type=int, default=1)
+    # REVISIT: at the moment, only batch size of 1 is working.
+    # parser.add_argument('-B', '--batch_size', help='batch size', type=int, default=1)
     parser.add_argument('-W', '--width', help='processing width', type=int, default=640)
     parser.add_argument('-H', '--height', help='processing height', type=int, default=512)
     parser.add_argument('model_path', help='path to model file', type=str, default=None)
     parser.add_argument('image_src', help='source of images - directory, file, or special', type=str, default=None)
     parser.add_argument('output_dir', help='path to write output images', nargs='?', type=str, default=None)
     args = parser.parse_args()
+    
+    # REVISIT: only batch_size of 1 is working
+    args.batch_size = 1
 
     pipe = build_pipeline(args)
 
