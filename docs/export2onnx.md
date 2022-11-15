@@ -1,64 +1,56 @@
-# MegadetectorV5: Export to ONNX - WIP
+# MegadetectorV5: Export to ONNX
 
 This is reasonably complicated as there are a lot of dependencies to manage and some of them are getting
 reasonably old.
 
-The document linked to explains how to make it work on a RaspberryPi 4b 8G with a clean install of the
-operating system. I documented it this way so I could capture all the software that was needed.
+This document explains how to run the export on a MacBook Pro x86_64 running MacOS 11.7.1.
 
-I also use it regularly on a MacbookPro x64 running MacOS 11.7.
+## Python 3.9
 
-Follow these [instructions](/docs/export2onnx.md).
+This requires `python3.9` to get all the python packages at the correct versions. It isn't on the Mac by default.
+A simple way to get it is to use homebrew.
 
-## System Setup
+Follow the instructions at the [homebrew website](https://brew.sh/) to install the package manager.
 
-Install the OS:
+Then install python3.9 with this command:
 
-- follow these [instructions](https://www.raspberrypi.com/software/)
-- Raspberry Pi OS Lite (64bit), 2022-09-22
-- set the hostname, enable ssh, set the username password
-- optionally set the ssh public key
+    brew install python@3.9
 
-Update the OS:
+You will need to make sure `/usr/local/bin` is in your path.
 
-    sudo apt update
-    sudo apt -y dist-upgrade
-    sudo reboot
+## Create Workspace
 
-Install system packages:
-
-    sudo apt install -y git
-    sudo apt install -y python3-venv libpython3-dev
-
-
-## Project Workspace
-
-Create the project workspace.
+Create the project workspace:
 
     mkdir -p ~/Projects/megadetector
     cd ~/Projects/megadetector
-    export PROJECTS=`pwd`
+    export MEGAEXPORT=`pwd`
 
 Clone this repository:
 
-    cd $PROJECTS
+    cd $MEGAEXPORT
     git clone https://github.com/parlaynu/megadetector-v5-onnx
+
+Clone yolo-v5 repository:
+
+    cd $MEGAEXPORT
+    git clone https://github.com/ultralytics/yolov5.git
+    cd yolov5
 
 Download the megadetector v5 saved models:
 
-    cd $PROJECTS
-    mkdir megamodels
-    wget https://github.com/microsoft/CameraTraps/releases/download/v5.0/md_v5a.0.0.pt -O megamodels/md_v5a.0.0.pt
-    wget https://github.com/microsoft/CameraTraps/releases/download/v5.0/md_v5b.0.0.pt -O megamodels/md_v5b.0.0.pt
+    cd $MEGAEXPORT
+    mkdir models
+    wget https://github.com/microsoft/CameraTraps/releases/download/v5.0/md_v5a.0.0.pt -O models/md_v5a.0.0.pt
+    wget https://github.com/microsoft/CameraTraps/releases/download/v5.0/md_v5b.0.0.pt -O models/md_v5b.0.0.pt
 
+## Python Environment Setup
 
-## Software Installation
+Create a python virtual environment:
 
-Setup python virtual environment:
-
-    cd $PROJECTS
-    python3.9 -m venv pyexport
-    source pyexport/bin/activate
+    cd $MEGAEXPORT
+    python3 -m venv pyenv
+    source pyenv/bin/activate
 
 Install the versions of torch and torchvision needed by megadetector v5:
 
@@ -66,7 +58,7 @@ Install the versions of torch and torchvision needed by megadetector v5:
 
 Install ONNX software:
 
-    pip install onnx==1.12.0
+    pip install onnx==1.12.0 onnxruntime==1.13.1 onnxoptimizer==0.3.2
 
 YoloV5 has a long list of packages to install, however, they're not all needed for exporting. Here's
 a minimal list to install:
@@ -74,48 +66,40 @@ a minimal list to install:
     pip install pyyaml==6.0 requests==2.28.1 tqdm==4.64.1
     pip install opencv-python-headless==4.6.0.66 pandas==1.5.1 seaborn==0.12.1
 
-## Clone The YoloV5 Repository and Export
-
-Clone yolo-v5 repository and install dependencies:
-
-    cd $PROJECTS
-    git clone https://github.com/ultralytics/yolov5.git
-    cd yolov5
-    git checkout c23a441c9df7ca9b1f275e8c8719c949269160d1
-
-Run the exporter. On the Raspberry Pi, it prints out the following warning, but it doesn't impact
-the running and it's safe to ignore it:
-
-    UserWarning: Failed to load image Python extension
+## Run the Export
 
 The exporter saves the exported model in the same directory as the original model but with a `onnx` extension. 
 You need to specify the image size and batch size you need when exporting.
 
-The general form of the exporter command is:
+To export a static model, the command is like this:
 
+    cd $MEGAEXPORT/yolov5
     python3 export.py --include onnx \
                 --weights <path-to-model.pt> \
                 --img-size <input-height> <input-width> --batch-size <batch-size>
 
-For example, exporting model-a for inputs image resolution 1280x1024 and batch size 1:
+To export a dynamic model, the command is like this:
+
+    cd $MEGAEXPORT/yolov5
+    python3 export.py --include onnx \
+                --weights <path-to-model.pt> \
+                --dynamic
+
+For example, exporting model-a for dynamic inputs:
 
     python3 export.py --include onnx \
-                --weights ../megamodels/md_v5a.0.0.pt \
-                --img-size 1024 1280 --batch-size 1
-
+                --weights ../models/md_v5a.0.0.pt \
+                --dynamic
 
 ## Optional: Optimize the Model
 
-You can optionally use the `tools/optimize-onnx.py` script to optimize the model. It didn't seem to 
-improve times very much though.
+You can optionally use the `tools/optimize-onnx.py` script to optimize the model. 
 
-This package needs to build from source for the Raspberry Pi. Seems to run quite smoothly though.
+It didn't seem to improve times very much in my testing.
 
-    pip install onnxoptimizer
+Run the optimizer over the model with this command:
 
-Run the optimizer over the model. The example below will create a model named `md_v5a.0.0-opt.onnx` in the
-same directory as the source model.
+    cd $MEGAEXPORT/megadetector-v5-onnx
+    ./tools/optimize-onnx.py ../models/md_v5a.0.0.onnx
 
-    cd $PROJECTS/megadetector-v5-onnx
-    ./tools/optimize-onnx.py ../megamodels/md_v5a.0.0.onnx
-
+The creates a model named `md_v5a.0.0_opt.onnx` in the same directory as the source model.

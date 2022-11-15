@@ -3,7 +3,7 @@
 This project explains how to export the [Megadetector V5](https://github.com/microsoft/CameraTraps/blob/main/megadetector.md) 
 models to ONNX format, and provides some tools to easily run inference using the ONNX model.
 
-The main reason I had for doing this was to make it easier to run on a range of platformss. In most cases, once you
+The main reason I had for doing this was to make it easier to run on a range of platforms. In most cases, once you
 have your model, just run a `pip install -r requirements.txt` (or requirements-gpu.txt or requirements-openvino.txt) and with
 the tools in this repository, you're ready to go. 
 
