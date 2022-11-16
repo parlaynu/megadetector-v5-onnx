@@ -34,13 +34,13 @@ Detailed documents for each step can be found at the following links:
 * [Other Tools](/docs/other_tools.md)
 * [Platform Notes](/docs/platform_notes.md)
 
-## What Does It Do?
+## How Does It Work?
 
-Here's a full run through of the environment setup and running inference on a RaspberryPi 4b with 8GBytes of RAM. 
+Below a full run through of the environment setup and running inference on a RaspberryPi 4b with 8GBytes of RAM. 
 
 It uses an ONNX model already exported (using the instructions in the link above) and available as below. This model
-expects image inputs of resolution 640x512 and a batch size of a single image; the `run-onnx.py` tool can determine
-this from the model (from the actual model, not its name) and resizes them accordingly.
+was exported statically, and expects image inputs of resolution 640x512 and a batch size of a single image; the 
+`run-onnx.py` tool can determine this from the model (from the actual model, not its name) and resizes them accordingly.
 
     $ ls -l models
     total 547220
