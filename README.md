@@ -109,7 +109,7 @@ Install dependencies:
 
 Run the inference:
 
-    $ ./tools/run-onnx.py -p -x -r \
+    $ ./tools/run-onnx.py -p -x \
                     ../models/md_v5a.0.0_640x512_1.onnx \
                     ./images/original \
                     ../outputs

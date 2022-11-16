@@ -59,6 +59,7 @@ You will probably need a fresh shell after installing pip - paths seem to be get
 An updated wheel package is also needed to build the wheel for onnxruntime:
 
     pip3 install --user --upgrade wheel
+    pip3 install --user packaging
 
 I think that gcc-8 and g++-8 are needed... not 100% sure, but I've been using it and I think
 this was the reason I installed it.
