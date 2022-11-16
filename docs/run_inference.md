@@ -90,7 +90,7 @@ provided.
 
 ### Example
 
-A simple example for using it to process 1 batch of images with a dynamic model:
+A simple example for using it to process 100 batches of images with a static model:
 
     ./tools/run-onnx.py -p -n 100 \
                     ../megamodels/md_v5a.0.0_640x512_1.onnx \
