@@ -9,7 +9,7 @@ def non_max_suppression(pred, conf_thresh=0.25, iou_thresh=0.45):
     
     # filter and sort the predictions by confidence threshold
     pred = pred[pred[..., 4] > conf_thresh]
-    pred = pred[np.flip(np.argsort(pred[..., 4], axis=-1))]
+    pred = pred[np.flip(np.argsort(pred[..., 4], axis=-1), axis=0)]
 
     # replace class prob with class label
     pred[..., 5] = np.argmax(pred[..., 5:], axis=-1)
