@@ -36,7 +36,8 @@ Detailed documents for each step can be found at the following links:
 
 ## How Does It Work?
 
-Below a full run through of the environment setup and running inference on a RaspberryPi 4b with 8GBytes of RAM. 
+Below is a full run through of the environment setup and running inference on a RaspberryPi 4b with 8GBytes of RAM. It
+installs the minimal packages needed to run inference.
 
 It uses an ONNX model already exported (using the instructions in the link above) and available as below. This model
 was exported statically, and expects image inputs of resolution 640x512 and a batch size of a single image; the 
@@ -69,43 +70,37 @@ Install dependencies:
     Looking in indexes: https://pypi.org/simple, https://www.piwheels.org/simple
     Collecting numpy==1.23.4
       Downloading numpy-1.23.4-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (14.0 MB)
-         |████████████████████████████████| 14.0 MB 6.1 MB/s 
+         |████████████████████████████████| 14.0 MB 5.5 MB/s 
     Collecting opencv-python-headless==4.6.0.66
       Downloading opencv_python_headless-4.6.0.66-cp36-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (27.2 MB)
-         |████████████████████████████████| 27.2 MB 82 kB/s 
-    Collecting onnx==1.12.0
-      Downloading onnx-1.12.0-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (13.0 MB)
-         |████████████████████████████████| 13.0 MB 7.1 MB/s 
+         |████████████████████████████████| 27.2 MB 81 kB/s 
     Collecting onnxruntime==1.13.1
       Downloading onnxruntime-1.13.1-cp39-cp39-manylinux_2_27_aarch64.whl (4.3 MB)
-         |████████████████████████████████| 4.3 MB 8.6 MB/s 
-    Collecting typing-extensions>=3.6.2.1
-      Downloading https://www.piwheels.org/simple/typing-extensions/typing_extensions-4.4.0-py3-none-any.whl (26 kB)
-    Collecting protobuf<=3.20.1,>=3.12.2
-      Downloading protobuf-3.20.1-cp39-cp39-manylinux2014_aarch64.whl (917 kB)
-         |████████████████████████████████| 917 kB 6.0 MB/s 
-    Collecting flatbuffers
-      Downloading https://www.piwheels.org/simple/flatbuffers/flatbuffers-20181003210633-py2.py3-none-any.whl (14 kB)
-    Collecting coloredlogs
-      Downloading https://www.piwheels.org/simple/coloredlogs/coloredlogs-15.0.1-py2.py3-none-any.whl (46 kB)
-         |████████████████████████████████| 46 kB 87 kB/s 
-    Collecting sympy
-      Downloading https://www.piwheels.org/simple/sympy/sympy-1.11.1-py3-none-any.whl (6.5 MB)
-         |████████████████████████████████| 6.5 MB 772 kB/s 
+         |████████████████████████████████| 4.3 MB 6.3 MB/s 
     Collecting packaging
       Downloading https://www.piwheels.org/simple/packaging/packaging-21.3-py3-none-any.whl (40 kB)
-         |████████████████████████████████| 40 kB 1.1 MB/s 
+         |████████████████████████████████| 40 kB 137 kB/s 
+    Collecting protobuf
+      Downloading protobuf-4.21.9-cp37-abi3-manylinux2014_aarch64.whl (403 kB)
+         |████████████████████████████████| 403 kB 6.0 MB/s 
+    Collecting flatbuffers
+      Downloading https://www.piwheels.org/simple/flatbuffers/flatbuffers-20181003210633-py2.py3-none-any.whl (14 kB)
+    Collecting sympy
+      Downloading https://www.piwheels.org/simple/sympy/sympy-1.11.1-py3-none-any.whl (6.5 MB)
+         |████████████████████████████████| 6.5 MB 738 kB/s 
+    Collecting coloredlogs
+      Downloading https://www.piwheels.org/simple/coloredlogs/coloredlogs-15.0.1-py2.py3-none-any.whl (46 kB)
+         |████████████████████████████████| 46 kB 1.1 MB/s 
     Collecting humanfriendly>=9.1
       Downloading https://www.piwheels.org/simple/humanfriendly/humanfriendly-10.0-py2.py3-none-any.whl (89 kB)
-         |████████████████████████████████| 89 kB 1.9 MB/s 
+         |████████████████████████████████| 89 kB 2.2 MB/s 
     Collecting pyparsing!=3.0.5,>=2.0.2
       Downloading https://www.piwheels.org/simple/pyparsing/pyparsing-3.0.9-py3-none-any.whl (98 kB)
-         |████████████████████████████████| 98 kB 322 kB/s 
+         |████████████████████████████████| 98 kB 330 kB/s 
     Collecting mpmath>=0.19
       Downloading https://www.piwheels.org/simple/mpmath/mpmath-1.2.1-py3-none-any.whl (532 kB)
-         |████████████████████████████████| 532 kB 376 kB/s 
-    Installing collected packages: pyparsing, mpmath, humanfriendly, typing-extensions, sympy, protobuf, packaging, numpy, flatbuffers, coloredlogs, opencv-python-headless, onnxruntime, onnx
-    Successfully installed coloredlogs-15.0.1 flatbuffers-20181003210633 humanfriendly-10.0 mpmath-1.2.1 numpy-1.23.4 onnx-1.12.0 onnxruntime-1.13.1 opencv-python-headless-4.6.0.66 packaging-21.3 protobuf-3.20.1 pyparsing-3.0.9 sympy-1.11.1 typing-extensions-4.4.0
+         |████████████████████████████████| 532 kB 382 kB/s 
+    Installing collected packages: pyparsing, mpmath, humanfriendly, sympy, protobuf, packaging, numpy, flatbuffers, coloredlogs, opencv-python-headless, onnxruntime
 
 Run the inference:
 

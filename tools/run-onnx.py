@@ -17,7 +17,7 @@ def prepare_session(model_path, force_cpu):
     providers = get_available_providers()
     print(f"- available providers: {providers}")
     
-    # converting to Tensor here takes a long time and the CUDA operator is just as fast. If you
+    # converting to TensorRT here can take a long time and the CUDA operator is just as fast. If you
     # really want to use TensorRT, then create a TensorRT model and use `run-trt.py`.
     providers = [p for p in providers if p != 'TensorrtExecutionProvider']
 
