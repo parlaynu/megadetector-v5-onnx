@@ -46,7 +46,7 @@ def _resize_pad(img, width, height, nchans, preserve_aspect):
             scale = min(width/iwidth, height/iheight)
             nwidth, nheight = int(scale*iwidth), int(scale*iheight)
         
-        print(f"- resizing from {iwidth}x{iheight} to {nwidth}x{nheight}")
+        print(f"- resizing from {iwidth}x{iheight} to {nwidth}x{nheight}", flush=True)
         img = cv2.resize(img, (nwidth, nheight), interpolation=cv2.INTER_LINEAR)
         
         if nwidth != width or nheight != height:
@@ -57,7 +57,7 @@ def _resize_pad(img, width, height, nchans, preserve_aspect):
             
             offset = (top, left)
 
-            print(f"- padding from {nwidth}x{nheight} to {width}x{height}")
+            print(f"- padding from {nwidth}x{nheight} to {width}x{height}", flush=True)
             img = cv2.copyMakeBorder(img, top, bottom, left, right, cv2.BORDER_CONSTANT)
 
     return img, offset

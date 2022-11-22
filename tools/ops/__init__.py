@@ -10,6 +10,11 @@ from .image_transform import transform_images
 from .infer import infer
 
 try:
+    from .infer_torch import infer_torch
+except ImportError:
+    pass
+
+try:
     from .infer_trt import infer_trt
 except ImportError:
     pass
