@@ -60,6 +60,7 @@ An updated wheel package is also needed to build the wheel for onnxruntime:
 
     pip3 install --user --upgrade wheel
     pip3 install --user packaging
+    pip3 install --user cython
 
 I think that gcc-8 and g++-8 are needed... not 100% sure, but I've been using it and I think
 this was the reason I installed it.
@@ -74,9 +75,67 @@ kitware's github releases.
 
 Make sure the `bin` directory of the installation is on your path.
 
+
+### Protobuf
+
+Instructions can be found here:
+
+    https://github.com/onnx/onnx/tree/rel-1.10.0#building-protobuf-from-source
+
+    export CC=/usr/bin/gcc-8
+    export CXX=/usr/bin/g++-8
+
+    git clone https://github.com/protocolbuffers/protobuf.git
+    cd protobuf
+    git checkout v3.16.0
+    git submodule update --init --recursive
+    mkdir build_source && cd build_source
+    cmake ../cmake -Dprotobuf_BUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_SYSCONFDIR=/etc -DCMAKE_POSITION_INDEPENDENT_CODE=ON -Dprotobuf_BUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Release
+    make -j$(nproc)
+    sudo make install
+
+
+### Numpy
+
+Version 1.19.5 is the latest version that attempts to install from a wheel using pip3. However, importing it fails with
+an "Illegal Instruction" error. 
+
+    export CC=/usr/bin/gcc-8
+    export CXX=/usr/bin/g++-8
+
+    git clone https://github.com/numpy/numpy.git
+    cd numpy
+    git checkout v1.19.5
+    git submodule update --init --recursive
+
+    python3 setup.py bdist_wheel
+
+    pip3 install --user dist/numpy-1.19.5-cp36-cp36m-linux_aarch64.whl
+
+
+### Onnx
+
+Instructions can be found here:
+
+    https://github.com/onnx/onnx/tree/rel-1.10.0#build-onnx-from-source
+
+    export CC=/usr/bin/gcc-8
+    export CXX=/usr/bin/g++-8
+
+    git clone https://github.com/onnx/onnx.git
+    cd onnx
+    git checkout v1.12.0
+    git submodule update --init --recursive
+    # prefer lite proto
+    export CMAKE_ARGS=-DONNX_USE_LITE_PROTO=ON
+    pip3 install --user .
+
 ### Onnxruntime
 
 Build onnxruntime:
+
+    export CC=/usr/bin/gcc-8
+    export CXX=/usr/bin/g++-8
 
     git clone https://github.com/microsoft/onnxruntime.git
     cd onnxruntime
@@ -84,8 +143,6 @@ Build onnxruntime:
     git submodule sync
     git submodule update --init --recursive --jobs 1
 
-    export CC=/usr/bin/gcc-8
-    export CXX=/usr/bin/g++-8
     ./build.sh --config Release --build --update --parallel --enable_pybind --build_wheel --skip_tests
 
     cd build/Linux/Release/dist
