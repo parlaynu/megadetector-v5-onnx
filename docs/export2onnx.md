@@ -36,6 +36,7 @@ Clone yolo-v5 repository:
     cd $MEGAEXPORT
     git clone https://github.com/ultralytics/yolov5.git
     cd yolov5
+    git checkout c23a441c9df7ca9b1f275e8c8719c949269160d1
 
 Download the megadetector v5 saved models:
 
@@ -49,7 +50,7 @@ Download the megadetector v5 saved models:
 Create a python virtual environment:
 
     cd $MEGAEXPORT
-    python3 -m venv pyenv
+    python3.9 -m venv pyenv
     source pyenv/bin/activate
 
 Install the versions of torch and torchvision needed by megadetector v5:
@@ -71,13 +72,6 @@ a minimal list to install:
 The exporter saves the exported model in the same directory as the original model but with a `onnx` extension. 
 You need to specify the image size and batch size you need when exporting.
 
-To export a static model, the command is like this:
-
-    cd $MEGAEXPORT/yolov5
-    python3 export.py --include onnx \
-                --weights <path-to-model.pt> \
-                --img-size <input-height> <input-width> --batch-size <batch-size>
-
 To export a dynamic model, the command is like this:
 
     cd $MEGAEXPORT/yolov5
@@ -90,6 +84,14 @@ For example, exporting model-a for dynamic inputs:
     python3 export.py --include onnx \
                 --weights ../models/md_v5a.0.0.pt \
                 --dynamic
+
+To export a static model, the command is like this:
+
+    cd $MEGAEXPORT/yolov5
+    python3 export.py --include onnx \
+                --weights <path-to-model.pt> \
+                --img-size <input-height> <input-width> --batch-size <batch-size>
+
 
 ## Optional: Optimize the Model
 
