@@ -3,8 +3,9 @@
 This project explains how to export the [Megadetector V5](https://github.com/microsoft/CameraTraps/blob/main/megadetector.md) 
 models to ONNX format, and provides some tools to easily run inference using the ONNX model.
 
-The main reason I had for doing this was to simplify running the model as it has far fewer dependencies - see the
-`requirements.txt` file.
+The motivation for this was to make it simpler to run: exporting to ONNX and running from that environment
+requires far fewer dependencies and with much simpler version constraints when compared to the full torch/megadetector/yolov5 
+environment.
 
 To further reduce external dependencies, there is also included an implementation of the batched non-maximum-suppression 
 algorithm implemented in `numpy`.
