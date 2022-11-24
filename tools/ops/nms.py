@@ -7,15 +7,12 @@ def non_max_suppression(pred, conf_thresh=0.25, iou_thresh=0.45):
     # prediction: x, y, w, h, box_conf, cls0_conf, cls2_cnf, ...
     num_classes = pred.shape[1] - 5
     
-    # sort the predictions by box confidence
+    # filter (by box conf_thresh) and sort the predictions
+    pred = pred[pred[..., 4] > conf_thresh]
     pred = pred[np.flip(np.argsort(pred[..., 4], axis=-1), axis=0)]
     # print(f"- top 5 boxes:")
     # for idx, p in enumerate(islice(pred, 5)):
     #     print(f"    {idx:02d} {p}")
-
-    # filter the predictions by box confidence threshold
-    pred = pred[pred[..., 4] > conf_thresh]
-    # print(f"- filtered preds: {len(pred)}")
 
     # replace class prob with class label
     pred[..., 5] = np.argmax(pred[..., 5:], axis=-1)
