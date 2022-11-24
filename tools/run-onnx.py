@@ -34,24 +34,27 @@ def build_pipeline(session, args):
     import ops
     
     print("building pipeline")
-        
+
+    # get the model input shape
     batch_size, nchans, height, width = session.get_inputs()[0].shape
     
     # check for dynamic model
     dynamic = isinstance(batch_size, str)
     if dynamic:
-        batch_size, height, width = args.batch_size, args.height, args.width
-        if batch_size == -1 or height == -1 or width == -1:
+        if args.batch_size == -1 or args.height == 0 or args.width == 0:
             print("Error: must specify batch_size, width and height for dynamic models")
             return None
+
+        batch_size, height, width = args.batch_size, args.height, args.width
     
-    else:
-        if args.batch_size != -1 or args.height != -1 or args.width != -1:
-            print("Error: can not specify batch_size, width or height for static models")
+    elif (args.batch_size != -1 and args.batch_size != batch_size) or \
+            (args.height != 0 and args.height != height) or \
+            (args.width != 0 and args.width != width):
+
+            print("Error: batch_size, width and height must match static model dimensions (or not be specified)")
             return None
     
     print(f"- input shape: {batch_size} {nchans} {height} {width}")
-    
     if not dynamic:
         print(f"- output shape: {session.get_outputs()[0].shape}")
 
@@ -103,7 +106,7 @@ def build_pipeline(session, args):
 
 
 def main():
-    import argparse
+    import argparse, re
     
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--force-cpu', help='use the CPU even if there is an accelerator', action='store_true')
@@ -112,15 +115,29 @@ def main():
     parser.add_argument('-a', '--save-all', help='save all images, not just those with detections', action='store_true')
     parser.add_argument('-t', '--conf-thresh', help='confidence threshold for nms', type=float, default=0.25)
     parser.add_argument('-u', '--iou-thresh', help='iou threshold for nms', type=float, default=0.45)
-    parser.add_argument('-N', '--num-batches', help='number of batches to process', type=int, default=0)
-    parser.add_argument('-B', '--batch_size', help='batch size for dynamic model', type=int, default=-1)
-    parser.add_argument('-W', '--width', help='processing width for dynamic model', type=int, default=-1)
-    parser.add_argument('-H', '--height', help='processing height for dynamic model', type=int, default=-1)
+    parser.add_argument('-n', '--num-batches', help='number of batches to process', type=int, default=0)
+    parser.add_argument('-b', '--batch-size', help='batch size for dynamic model', type=int, default=-1)
+    parser.add_argument('-s', '--image-size', help='image <width>x<height> for dynamic model', type=str, default="0x0")
     parser.add_argument('model_path', help='path to model file', type=str, default=None)
     parser.add_argument('image_src', help='source of images - directory, file, or special', type=str, default=None)
     parser.add_argument('output_dir', help='path to write output images', nargs='?', type=str, default=None)
     args = parser.parse_args()
+    
+    # check the image size specifier
+    size_re = re.compile(r"^(\d+)x(\d+)$")
+    m = size_re.match(args.image_size)
+    if m is None:
+        print(f"Error: unrecognized image size specification: {args.image_size}")
+        return 
 
+    args.width = int(m.group(1))
+    args.height = int(m.group(2))
+    
+    if args.width % 64 != 0 or args.height % 64 != 0:
+        print("Error: megadetector requires width and height to be integer multiples of 64")
+        return
+    
+    # build the pipeline
     sess = prepare_session(args.model_path, args.force_cpu)
     pipe = build_pipeline(sess, args)
     if pipe is None:

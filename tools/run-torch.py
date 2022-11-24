@@ -8,8 +8,8 @@ def build_pipeline(args):
     import ops
     
     print("building pipeline")
-    batch_size, height, width = args.batch_size, args.height, args.width
-    nchans = 3
+
+    batch_size, nchans, height, width = args.batch_size, 3, args.height, args.width
     print(f"- input shape: {batch_size} {nchans} {height} {width}")
 
     if args.image_src.startswith("picamera2"):
@@ -60,7 +60,7 @@ def build_pipeline(args):
 
 
 def main():
-    import argparse
+    import argparse, re
     
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--force-cpu', help='use the CPU even if there is an accelerator', action='store_true')
@@ -69,15 +69,29 @@ def main():
     parser.add_argument('-a', '--save-all', help='save all images, not just those with detections', action='store_true')
     parser.add_argument('-t', '--conf-thresh', help='confidence threshold for nms', type=float, default=0.25)
     parser.add_argument('-u', '--iou-thresh', help='iou threshold for nms', type=float, default=0.45)
-    parser.add_argument('-N', '--num-batches', help='number of batches to process', type=int, default=0)
-    parser.add_argument('-B', '--batch_size', help='batch size for dynamic model', type=int, default=-1)
-    parser.add_argument('-W', '--width', help='processing width for dynamic model', type=int, default=-1)
-    parser.add_argument('-H', '--height', help='processing height for dynamic model', type=int, default=-1)
+    parser.add_argument('-n', '--num-batches', help='number of batches to process', type=int, default=0)
+    parser.add_argument('-b', '--batch-size', help='batch size', type=int, default=1)
+    parser.add_argument('-s', '--image-size', help='image <width>x<height> for processing', type=str, default="640x512")
     parser.add_argument('model_path', help='path to model file', type=str, default=None)
     parser.add_argument('image_src', help='source of images - directory, file, or special', type=str, default=None)
     parser.add_argument('output_dir', help='path to write output images', nargs='?', type=str, default=None)
     args = parser.parse_args()
 
+    # check image and batch size
+    size_re = re.compile(r"^(\d+)x(\d+)$")
+    m = size_re.match(args.image_size)
+    if m is None:
+        print(f"Error: unrecognized the image size specification: {args.image_size}")
+        return
+
+    args.width = int(m.group(1))
+    args.height = int(m.group(2))
+    
+    if args.width % 64 != 0 or args.height % 64 != 0:
+        print("Error: megadetector requires width and height to be integer multiples of 64")
+        return
+
+    # build the pipeline
     pipe = build_pipeline(args)
     if pipe is None:
         return

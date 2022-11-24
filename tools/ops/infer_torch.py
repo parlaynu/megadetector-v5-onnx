@@ -16,7 +16,7 @@ def infer_torch(pipe, model, force_cpu, conf_thresh, iou_thresh):
     for item in pipe:
         inp = torch.from_numpy(item['input'])
         inp = inp.to(device)
-
+        
         # run the forward pass
         with torch.no_grad():
             pred = model(inp)
@@ -30,7 +30,6 @@ def infer_torch(pipe, model, force_cpu, conf_thresh, iou_thresh):
         
         preds = []
         for idx, p in enumerate(pred):
-            print(p.shape)
             p = non_max_suppression(p, conf_thresh, iou_thresh)
             print(f"- {idx:02d}: found {len(p)} objects", flush=True)
             preds.append(p)
