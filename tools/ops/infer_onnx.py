@@ -1,7 +1,7 @@
 from .nms import non_max_suppression
 
 
-def infer(pipe, sess, conf_thresh, iou_thresh):
+def infer_onnx(pipe, sess, conf_thresh, iou_thresh):
 
     for item in pipe:
         inp = item['input']

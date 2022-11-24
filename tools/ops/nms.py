@@ -1,4 +1,4 @@
-# tail-recursive implementation of NMS
+from itertools import islice
 import numpy as np
 
 
@@ -7,16 +7,22 @@ def non_max_suppression(pred, conf_thresh=0.25, iou_thresh=0.45):
     # prediction: x, y, w, h, box_conf, cls0_conf, cls2_cnf, ...
     num_classes = pred.shape[1] - 5
     
-    # filter and sort the predictions by confidence threshold
-    pred = pred[pred[..., 4] > conf_thresh]
+    # sort the predictions by box confidence
     pred = pred[np.flip(np.argsort(pred[..., 4], axis=-1), axis=0)]
+    # print(f"- top 5 boxes:")
+    # for idx, p in enumerate(islice(pred, 5)):
+    #     print(f"    {idx:02d} {p}")
+
+    # filter the predictions by box confidence threshold
+    pred = pred[pred[..., 4] > conf_thresh]
+    # print(f"- filtered preds: {len(pred)}")
 
     # replace class prob with class label
     pred[..., 5] = np.argmax(pred[..., 5:], axis=-1)
     pred = pred[..., :6]
     
     # convert boxes to xyxy
-    pred[..., :4] = xywh2xyxy(pred[..., :4])
+    pred[..., :4] = _xywh2xyxy(pred[..., :4])
 
     # run the nms
     return _nms(pred, iou_thresh, [])
@@ -35,7 +41,7 @@ def _nms(pred, iou_thresh, npred):
         return npred
     
     # create the IOUs
-    ious = calc_ious(p0, px)
+    ious = _calc_ious(p0, px)
     
     # for non-matching class, set the iou to 0 so they don't get considered
     ious[px[..., 5] != p0[5]] = 0
@@ -46,7 +52,7 @@ def _nms(pred, iou_thresh, npred):
     return _nms(pp, iou_thresh, npred)
 
 
-def calc_ious(b0, bx):
+def _calc_ious(b0, bx):
     # intersection area: (max(0, min(bottom) - max(top))) * (max(0, min(right) - max(left)))
     i_area = np.maximum(np.minimum(b0[2:4], bx[..., 2:4]) - np.maximum(b0[:2], bx[..., :2]), 0).prod(axis=1)
     
@@ -56,7 +62,7 @@ def calc_ious(b0, bx):
     return i_area / u_area
     
 
-def xywh2xyxy(xywh):
+def _xywh2xyxy(xywh):
     xyxy = np.zeros_like(xywh)
     xc, yc, half_w, half_h = xywh[:, 0], xywh[:, 1], xywh[:, 2]/2, xywh[:, 3]/2
     xyxy[:, 0] = xc - half_w

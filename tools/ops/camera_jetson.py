@@ -42,6 +42,7 @@ def load_from_jetson_csi(params, width, height):
 
         ok, img = cam.read()
         if ok == False:
+            print("- read failed")
             break
         
         # REVISIT: find a gstreamer way to do this

@@ -61,12 +61,12 @@ def main():
     import argparse
     
     parser = argparse.ArgumentParser()
-    parser.add_argument('-n', '--num-batches', help='number of batches to process', type=int, default=0)
-    parser.add_argument('-a', '--save-all', help='save all images, not just those with detections', action='store_true')
     parser.add_argument('-p', '--preserve-aspect', help='preserve image aspect ratio (pad if needed)', action='store_true')
     parser.add_argument('-x', '--cut-objects', help='cut detected objects from full image and save as individual images', action='store_true')
+    parser.add_argument('-a', '--save-all', help='save all images, not just those with detections', action='store_true')
     parser.add_argument('-t', '--conf-thresh', help='confidence threshold for nms', type=float, default=0.25)
     parser.add_argument('-u', '--iou-thresh', help='iou threshold for nms', type=float, default=0.45)
+    parser.add_argument('-N', '--num-batches', help='number of batches to process', type=int, default=0)
     # REVISIT: at the moment, only batch size of 1 is working.
     # parser.add_argument('-B', '--batch_size', help='batch size', type=int, default=1)
     parser.add_argument('-W', '--width', help='processing width', type=int, default=640)

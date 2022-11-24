@@ -84,7 +84,7 @@ def build_pipeline(session, args):
         pipe = ops.batcher(pipe, batch_size)
 
     pipe = ops.transform_images(pipe, width, height, nchans, args.preserve_aspect)
-    pipe = ops.infer(pipe, session, args.conf_thresh, args.iou_thresh)
+    pipe = ops.infer_onnx(pipe, session, args.conf_thresh, args.iou_thresh)
 
     if args.output_dir is not None:
         pipe = ops.draw_bboxes(pipe)
@@ -106,13 +106,13 @@ def main():
     import argparse
     
     parser = argparse.ArgumentParser()
-    parser.add_argument('-n', '--num-batches', help='number of batches to process', type=int, default=0)
     parser.add_argument('-c', '--force-cpu', help='use the CPU even if there is an accelerator', action='store_true')
-    parser.add_argument('-a', '--save-all', help='save all images, not just those with detections', action='store_true')
     parser.add_argument('-p', '--preserve-aspect', help='preserve image aspect ratio (pad if needed)', action='store_true')
     parser.add_argument('-x', '--cut-objects', help='cut detected objects from full image and save as individual images', action='store_true')
+    parser.add_argument('-a', '--save-all', help='save all images, not just those with detections', action='store_true')
     parser.add_argument('-t', '--conf-thresh', help='confidence threshold for nms', type=float, default=0.25)
     parser.add_argument('-u', '--iou-thresh', help='iou threshold for nms', type=float, default=0.45)
+    parser.add_argument('-N', '--num-batches', help='number of batches to process', type=int, default=0)
     parser.add_argument('-B', '--batch_size', help='batch size for dynamic model', type=int, default=-1)
     parser.add_argument('-W', '--width', help='processing width for dynamic model', type=int, default=-1)
     parser.add_argument('-H', '--height', help='processing height for dynamic model', type=int, default=-1)
@@ -131,6 +131,10 @@ def main():
     print("running")
     pipe = pipe if args.num_batches == 0 else islice(pipe, args.num_batches)
     for idx, item in enumerate(pipe):
+        # don't count the first iteration in the total time...
+        #    can take a while in some instances
+        if idx == 0:
+            start = time.time()
         pass
     
     print("summary")

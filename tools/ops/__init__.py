@@ -7,7 +7,7 @@ from .camera_jetson import load_from_jetson_csi
 from .batcher import batcher
 from .image_transform import transform_images
 
-from .infer import infer
+from .infer_onnx import infer_onnx
 
 try:
     from .infer_torch import infer_torch

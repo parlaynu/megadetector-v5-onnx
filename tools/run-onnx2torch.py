@@ -5,7 +5,11 @@ from itertools import islice, count
 
 
 def build_pipeline(args):
+    from onnx2torch import convert
     import ops
+    
+    print("converting model to torch")
+    model = convert(args.model_path)
     
     print("building pipeline")
     batch_size, height, width = args.batch_size, args.height, args.width
@@ -41,7 +45,7 @@ def build_pipeline(args):
         pipe = ops.batcher(pipe, batch_size)
 
     pipe = ops.transform_images(pipe, width, height, nchans, args.preserve_aspect)
-    pipe = ops.infer_torch(pipe, args.model_path, args.force_cpu, args.conf_thresh, args.iou_thresh)
+    pipe = ops.infer_torch(pipe, model, args.force_cpu, args.conf_thresh, args.iou_thresh)
 
     if args.output_dir is not None:
         pipe = ops.draw_bboxes(pipe)
