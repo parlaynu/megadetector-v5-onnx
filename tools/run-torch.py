@@ -4,7 +4,26 @@ import time
 from itertools import islice, count
 
 
-def build_pipeline(args):
+def prepare_model(args):
+    import torch
+    
+    device = torch.device('cuda') if (not args.force_cpu and torch.cuda.is_available()) else torch.device('cpu')
+    print(f"running on {device}")
+    
+    checkpoint = torch.load(args.model_path, map_location=device)
+    
+    if args.fuse_layers:
+        print("- fusing model")
+        model = checkpoint['model'].float().fuse().eval()
+    else:
+        model = checkpoint['model'].float().eval()
+
+    model.device = device
+
+    return model
+
+    
+def build_pipeline(args, model):
     import ops
     
     print("building pipeline")
@@ -41,7 +60,7 @@ def build_pipeline(args):
         pipe = ops.batcher(pipe, batch_size)
 
     pipe = ops.transform_images(pipe, width, height, nchans, args.preserve_aspect)
-    pipe = ops.infer_torch(pipe, args.model_path, args.force_cpu, args.conf_thresh, args.iou_thresh)
+    pipe = ops.infer_torch(pipe, model, args.conf_thresh, args.iou_thresh)
 
     if args.output_dir is not None:
         pipe = ops.draw_bboxes(pipe)
@@ -64,6 +83,7 @@ def main():
     
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--force-cpu', help='use the CPU even if there is an accelerator', action='store_true')
+    parser.add_argument('-f', '--fuse-layers', help='fuse model layers', action='store_true')
     parser.add_argument('-p', '--preserve-aspect', help='preserve image aspect ratio (pad if needed)', action='store_true')
     parser.add_argument('-x', '--cut-objects', help='cut detected objects from full image and save as individual images', action='store_true')
     parser.add_argument('-a', '--save-all', help='save all images, not just those with detections', action='store_true')
@@ -92,7 +112,8 @@ def main():
         return
 
     # build the pipeline
-    pipe = build_pipeline(args)
+    model = prepare_model(args)
+    pipe = build_pipeline(args, model)
     if pipe is None:
         return
 

@@ -4,14 +4,32 @@ import time
 from itertools import islice, count
 
 
-def build_pipeline(args):
+def prepare_model(args):
+    import torch
+    
+    device = torch.device('cuda') if (not args.force_cpu and torch.cuda.is_available()) else torch.device('cpu')
+    print(f"running on {device}")
+
+    print("- converting model to torch")
+    model = convert(args.model_path)
+    
+    if args.fuse_layers:
+        print(f"- fusing model")
+        model = model.fuse().eval()
+    else:
+        model = model.eval()
+    
+    model = model.to(device)
+    model.device = device
+
+    return model
+
+
+def build_pipeline(args, model):
     from onnx2torch import convert
     import ops
     
     print("building pipeline")
-
-    print("- converting model to torch")
-    model = convert(args.model_path)
 
     batch_size, nchans, height, width = args.batch_size, 3, args.height, args.width
     print(f"- input shape: {batch_size} {nchans} {height} {width}")
@@ -45,7 +63,7 @@ def build_pipeline(args):
         pipe = ops.batcher(pipe, batch_size)
 
     pipe = ops.transform_images(pipe, width, height, nchans, args.preserve_aspect)
-    pipe = ops.infer_torch(pipe, model, args.force_cpu, args.conf_thresh, args.iou_thresh)
+    pipe = ops.infer_torch(pipe, model, args.conf_thresh, args.iou_thresh)
 
     if args.output_dir is not None:
         pipe = ops.draw_bboxes(pipe)
@@ -68,6 +86,7 @@ def main():
     
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--force-cpu', help='use the CPU even if there is an accelerator', action='store_true')
+    parser.add_argument('-f', '--fuse-layers', help='fuse model layers', action='store_true')
     parser.add_argument('-p', '--preserve-aspect', help='preserve image aspect ratio (pad if needed)', action='store_true')
     parser.add_argument('-x', '--cut-objects', help='cut detected objects from full image and save as individual images', action='store_true')
     parser.add_argument('-a', '--save-all', help='save all images, not just those with detections', action='store_true')
@@ -96,7 +115,8 @@ def main():
         return None
 
     # build the pipeline
-    pipe = build_pipeline(args)
+    model = prepare_model(args)
+    pipe = build_pipeline(args, model)
     if pipe is None:
         return
 

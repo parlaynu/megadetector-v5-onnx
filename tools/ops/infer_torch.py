@@ -2,17 +2,9 @@ import torch
 from .nms import non_max_suppression
 
 
-def infer_torch(pipe, model, force_cpu, conf_thresh, iou_thresh):
-    
-    device = torch.device('cuda') if (not force_cpu and torch.cuda.is_available()) else torch.device('cpu')
-    print(f"running on {device}")
-    
-    if isinstance(model, str):
-        checkpoint = torch.load(model, map_location=device)
-        model = checkpoint['model'].float().eval()
+def infer_torch(pipe, model, conf_thresh, iou_thresh):
 
-    model = model.to(device)
-
+    device = model.device
     for item in pipe:
         inp = torch.from_numpy(item['input'])
         inp = inp.to(device)
