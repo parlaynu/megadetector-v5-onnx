@@ -1,6 +1,6 @@
 # Jetson Nano
 
-The Jetson Nano has python3.6. It can't update to 3.9 because a lot of the packages needed to use the jetson
+The Jetson Nano has python3.6. It can't be update to 3.9 because a lot of the packages needed to use the jetson
 are custom built by Nvidia to use the hardware. This includes `opencv` which is installed as part of the jetpack.
 
 The installed jetpack I built from was 4.6.2:
@@ -8,14 +8,32 @@ The installed jetpack I built from was 4.6.2:
     apt search jetpack | grep installed
     nvidia-jetpack/stable,now 4.6.2-b5 arm64 [installed]
 
+## Timing Tests
+
+Results from some testing.
+
+* Image source: local disk
+* Number of Images: 55
+* Processing Resolution: 640x512
+* Batch Size: 1
+
+| Model/Options      | Per Image Time       |
+|--------------------|----------------------|
+| ONNX, CPU          |   7.70s              |
+| Torch, CPU         |   8.35s              |
+| Torch, CPU, Fused  |   8.20s              |
+| Torch, GPU         |   1.10s              |
+| Torch, GPU, Fused  |   1.11s              |
+
+
 ## Dependencies
 
 Get an updated pip3 to install. Mainly because the system pip3 uses `--ignore-installed` by default which
-breaks things.
+continually wants to reinstall packages, overriding the system installed packages and breaking things.
 
     pip3 install --user --upgrade pip
 
-You will probably need a fresh shell after installing pip - paths seem to be getting confused.
+You will probably need a fresh login after installing pip - paths seem to be getting confused.
 
 An updated wheel package is also needed to build the wheel for onnxruntime:
 
@@ -127,18 +145,24 @@ Build onnxruntime:
     pip3 install --user *whl
 
 
-## Torch
+## Torch and Torchvision with CUDA Support
 
-The torch wheels available don't support cuda, so it needs to be built from source.
+The torch wheels available don't support cuda, so it needs to be built from source. 
+
+However, there's something missing either in the build instructions below, or the jetson environment - the 
+inference works when run on the GPU, but running on the CPU fails. Using the standard `pip` installed
+torch and torchvision works fine for the CPU.
+
+I've tried various things, but haven't been able to resolve the problem.
 
 Build torch 1.10.2
 
-    pip3 install astunparse ninja pyyaml cmake cffi typing_extensions future six requests dataclasses
+    pip3 install astunparse ninja cffi typing_extensions future six requests dataclasses
 
     export MAX_JOBS=4
-    export BLAS=OpenBLAS
+    export USE_CUDA=1
     export USE_OPENCV=1
-    export USE_DISTRIBUTED=0
+    export BLAS=OpenBLAS
     export BUILD_TEST=0
 
     git clone https://github.com/pytorch/pytorch torch
@@ -151,17 +175,12 @@ Build torch 1.10.2
 
     pip install dist/*whl
 
-
-## Torchvision
-
 Build torchvision 0.11.3
 
     git clone https://github.com/pytorch/vision.git torchvision
     git checkout v0.11.3
 
     python3 setup.py bdist_wheel
-
-Install it into the virtual env.
 
     pip install dist/*whl
 

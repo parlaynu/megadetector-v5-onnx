@@ -2,7 +2,7 @@
 
 OS Version: RaspberryPi OS Lite (64 bit) 2022-09-22
 
-## Timing
+## Timing Tests
 
 Results from some testing on a RaspberryPi 4 with 8GBytes of RAM.
 
@@ -13,10 +13,10 @@ Results from some testing on a RaspberryPi 4 with 8GBytes of RAM.
 
 | Model/Options      | Per Image Time       |
 |--------------------|----------------------|
+| ONNX, NCS2         |   1.51s              |   
+| ONNX, CPU          |   6.67s              |
 | Torch, CPU         |   8.24s              |
 | Torch, CPU, Fused  |   8.26s              |
-| ONNX, CPU          |   6.67s              |
-| ONNX, NCS2         |   1.51s              |   
 
 Where NCS2 is Intel's Neural Compute Stick 2.
 
