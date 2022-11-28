@@ -101,6 +101,10 @@ def main():
     print("running")
     pipe = pipe if args.num_batches == 0 else islice(pipe, args.num_batches)
     for idx, item in enumerate(pipe):
+        # don't count the first iteration in the total time...
+        #    can take a while in some instances
+        if idx == 0:
+            start = time.time()
         pass
     
     print("summary")

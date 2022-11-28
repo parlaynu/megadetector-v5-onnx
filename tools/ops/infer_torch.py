@@ -9,7 +9,7 @@ def infer_torch(pipe, model, force_cpu, conf_thresh, iou_thresh):
     
     if isinstance(model, str):
         checkpoint = torch.load(model, map_location=device)
-        model = checkpoint['model'].float().eval()  # .fuse()
+        model = checkpoint['model'].float().eval()
 
     model = model.to(device)
 
