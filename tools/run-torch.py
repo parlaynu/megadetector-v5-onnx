@@ -6,11 +6,12 @@ from itertools import islice, count
 
 def prepare_model(args):
     import torch
+
     
     device = torch.device('cuda') if (not args.force_cpu and torch.cuda.is_available()) else torch.device('cpu')
     print(f"running on {device}")
     
-    checkpoint = torch.load(args.model_path, map_location=device)
+    checkpoint = torch.load(args.model_path, map_location=torch.device('cpu'))
     
     if args.fuse_layers:
         print("- fusing model")
@@ -18,6 +19,7 @@ def prepare_model(args):
     else:
         model = checkpoint['model'].float().eval()
 
+    model = model.to(device)
     model.device = device
 
     return model
