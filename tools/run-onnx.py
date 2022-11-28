@@ -160,7 +160,7 @@ def main():
     print(f"- total runtime: {duration:0.2f}")
 
     try:
-        average = duration / (idx+1)
+        average = duration / (idx)
         print(f"-       average: {average:0.2f}")
     except UnboundLocalError:
         pass

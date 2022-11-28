@@ -7,6 +7,7 @@ def infer_onnx(pipe, sess, conf_thresh, iou_thresh):
         inp = item['input']
 
         # run the forward pass
+        print("- running inference", flush=True)
         pred = sess.run(None, {'images': inp})
         
         # NMS returns a list of predictions... one tensor for each baatch entry

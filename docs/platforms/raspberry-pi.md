@@ -2,6 +2,24 @@
 
 OS Version: RaspberryPi OS Lite (64 bit) 2022-09-22
 
+## Timing
+
+Results from some testing on a RaspberryPi 4 with 8GBytes of RAM.
+
+* Image source: local disk
+* Number of Images: 55
+* Processing Resolution: 640x512
+* Batch Size: 1
+
+| Model/Options      | Per Image Time       |
+|--------------------|----------------------|
+| Torch, CPU         |   8.24s              |
+| Torch, CPU, Fused  |   8.26s              |
+| ONNX, CPU          |   6.67s              |
+| ONNX, NCS2         |   1.51s              |   
+
+Where NCS2 is Intel's Neural Compute Stick 2.
+
 ## PiCamera2
 
 The PiCamera2 complicates the installation a little - it is available on pypi.org however, not all of
