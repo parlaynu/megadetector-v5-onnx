@@ -1,0 +1,16 @@
+numpy==1.23.4
+opencv-python-headless==4.6.0.66
+onnxruntime-gpu==1.13.1
+
+# optional: to use the tool 'run-torch.py'
+#torch==1.10.2
+#torchvision==0.11.3
+
+# optional: to use the tool 'run-onnx2torch.py'
+#torch==1.13.0
+#torchvision==0.14.0
+#onnx2torch==1.5.4
+
+# optional: to use the tools 'check-onnx.py' and 'optimize-onnx.py'
+#onnx==1.12.0
+#onnxoptimizer==0.3.2
