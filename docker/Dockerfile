@@ -1,7 +1,7 @@
 FROM python:3.9-slim
 
 RUN apt-get update && \
-    apt-get install --no-install-recommends -y git && \
+    apt-get install --no-install-recommends -y git wget && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -25,6 +25,6 @@ RUN git init . && \
     git checkout FETCH_HEAD
 
 WORKDIR /megadetector
-COPY . .
+COPY md2onnx.sh .
 
 CMD [ "./md2onnx.sh" ]
