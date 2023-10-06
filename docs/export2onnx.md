@@ -5,7 +5,7 @@ reasonably old.
 
 This document explains how to run the export on a MacBook Pro x86_64 running MacOS 11.7.1.
 
-NOTE: if you have a working docker environment, the below can be automated using the setup in the 'contrib' directory.
+NOTE: if you have a working docker environment, the below can be automated using the setup in the 'export-docker' directory.
 
 ## Python 3.9
 
