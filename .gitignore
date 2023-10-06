@@ -3,6 +3,7 @@ local/
 output/
 snapshots/
 snapshots-*/
+models/
 model_zoo/
 *.egg-info/
 pyenv/
