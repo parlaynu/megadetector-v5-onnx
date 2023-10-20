@@ -1,9 +1,5 @@
 # Exporting ONNX to TensorRT
 
-NOTE: I have run this successfully on a larger x86_64 machine, however, there's no noticeable advantage
-over using ONNX with the 'CUDAExecutionProvider'. I'd recommend skipping this unless you have a really
-good reason to be using TensorRT.
-
 This is based on the information in the following documents:
 
 * https://docs.nvidia.com/deeplearning/tensorrt/quick-start-guide/index.html#ex-deploy-onnx
