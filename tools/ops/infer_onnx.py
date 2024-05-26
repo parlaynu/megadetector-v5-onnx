@@ -10,7 +10,7 @@ def infer_onnx(pipe, sess, conf_thresh, iou_thresh):
         print("- running inference", flush=True)
         pred = sess.run(None, {'images': inp})
         
-        # NMS returns a list of predictions... one tensor for each baatch entry
+        # NMS returns a list of predictions... one tensor for each batch entry
         # - 6 items per prediction: x1, y1, x2, y2, conf, cls
         
         preds = []

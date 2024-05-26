@@ -7,9 +7,6 @@ The motivation for this was to make it simpler to run: exporting to ONNX and run
 requires far fewer dependencies and with much simpler version constraints when compared to the full torch/megadetector/yolov5 
 environment.
 
-To further reduce external dependencies, there is also included an implementation of the batched non-maximum-suppression 
-algorithm implemented in `numpy`.
-
 The exporting can be complicated, but you can export the ONNX model on any platform where all the requirements are readily 
 satisfied, and then run inference on another with just the minimal dependencies.
 

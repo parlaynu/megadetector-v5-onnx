@@ -56,8 +56,8 @@ Any combination of prefix,hflip,vflip can be used with the camera devices.
 
 The `run-onnx.py` tool accepts the following arguments:
 
-    usage: run-onnx.py [-h] [-n NUM_BATCHES] [-c] [-a] [-p] [-x] [-t CONF_THRESH] [-u IOU_THRESH] [-B BATCH_SIZE]
-                       [-W WIDTH] [-H HEIGHT]
+    usage: run-onnx.py [-h] [-c] [-p] [-x] [-a] [-t CONF_THRESH] [-u IOU_THRESH] [-n NUM_BATCHES] [-b BATCH_SIZE]
+                       [-s IMAGE_SIZE]
                        model_path image_src [output_dir]
                        
     positional arguments:
@@ -67,23 +67,21 @@ The `run-onnx.py` tool accepts the following arguments:
       
     optional arguments:
       -h, --help            show this help message and exit
-      -n NUM_BATCHES, --num-batches NUM_BATCHES
-                            number of batches to process
       -c, --force-cpu       use the CPU even if there is an accelerator
-      -a, --save-all        save all images, not just those with detections
       -p, --preserve-aspect
                             preserve image aspect ratio (pad if needed)
       -x, --cut-objects     cut detected objects from full image and save as individual images
+      -a, --save-all        save all images, not just those with detections
       -t CONF_THRESH, --conf-thresh CONF_THRESH
                             confidence threshold for nms
       -u IOU_THRESH, --iou-thresh IOU_THRESH
                             iou threshold for nms
-      -B BATCH_SIZE, --batch_size BATCH_SIZE
+      -n NUM_BATCHES, --num-batches NUM_BATCHES
+                            number of batches to process
+      -b BATCH_SIZE, --batch-size BATCH_SIZE
                             batch size for dynamic model
-      -W WIDTH, --width WIDTH
-                            processing width for dynamic model
-      -H HEIGHT, --height HEIGHT
-                            processing height for dynamic model
+      -s IMAGE_SIZE, --image-size IMAGE_SIZE
+                            image <width>x<height> for dynamic model
 
 For static models, the batch, width and height arguments can not be specified; for dynamic models, they must be
 provided.

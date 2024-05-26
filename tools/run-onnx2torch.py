@@ -6,6 +6,7 @@ from itertools import islice, count
 
 def prepare_model(args):
     import torch
+    from onnx2torch import convert
     
     device = torch.device('cuda') if (not args.force_cpu and torch.cuda.is_available()) else torch.device('cpu')
     print(f"running on {device}")
@@ -26,7 +27,6 @@ def prepare_model(args):
 
 
 def build_pipeline(args, model):
-    from onnx2torch import convert
     import ops
     
     print("building pipeline")

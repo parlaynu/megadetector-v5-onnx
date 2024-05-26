@@ -75,7 +75,7 @@ def build_pipeline(session, args):
         pipe = ops.load_from_jetson_csi(params, width, height)
     
     else:  # fall back to images/videos from disk
-        params = ['jpg', 'jpeg']
+        params = []
         cidx = args.image_src.find(':', 2)
         if cidx != -1:
             params = args.image_src[cidx+1:].split(',')
@@ -151,19 +151,20 @@ def main():
         # don't count the first iteration in the total time...
         #    can take a while in some instances
         if idx == 0:
-            start = time.time()
+            start = time.monotonic()
         pass
     
     print("summary")
 
-    duration = time.time() - start
+    duration = time.monotonic() - start
     print(f"- total runtime: {duration:0.2f}")
 
-    try:
-        average = duration / (idx)
-        print(f"-       average: {average:0.2f}")
-    except UnboundLocalError:
-        pass
+    if idx > 0:
+        try:
+            average = duration / (idx)
+            print(f"-       average: {average:0.2f}")
+        except UnboundLocalError:
+            pass
         
 
 
